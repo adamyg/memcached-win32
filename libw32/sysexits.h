@@ -1,5 +1,3 @@
-#ifndef LIBW32_SYSEXITS_H_INCLUDED
-#define LIBW32_SYSEXITS_H_INCLUDED
 /*
  * Copyright (c) 1987, 1993
  *	The Regents of the University of California.  All rights reserved.
@@ -108,5 +106,3 @@
 #define EX__MAX	        78	/* maximum listed value */
 
 #endif /* sysexits.h */
-#endif /*GR_SYSEXITS_H_INCLUDED*/
-#endif /*LIBW32_SYSEXITS_H_INCLUDED*/
