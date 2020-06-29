@@ -1,5 +1,4 @@
 libevent-*/
-event2/
 Makefile
 .headers*
 .unpacked*
