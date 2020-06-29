@@ -1,0 +1,114 @@
+#ifndef LIBCOMPACT_H_INCLUDED
+#define LIBCOMPACT_H_INCLUDED
+//
+//  libcompat
+//
+
+#include "w32config.h"
+
+#include <sys/types.h>
+#include <stdio.h>
+
+#if !defined(HAVE_STRNLEN)
+extern size_t strnlen(const char *str, size_t maxlen);
+#if !defined(LIBCOMPAT_SOURCE)
+#define HAVE_STRNLEN
+#endif
+#endif
+
+#if !defined(HAVE_STRNDUP)
+extern char *strndup(const char *str, size_t maxlen);
+#if !defined(LIBCOMPAT_SOURCE)
+#define HAVE_STRNDUP
+#endif
+#endif
+
+#if !defined(HAVE_STRCATN)
+extern char *strcatn(register char *s1, register char *s2, register int n);
+#if !defined(LIBCOMPAT_SOURCE)
+#define HAVE_STRCATN
+#endif
+#endif
+
+#if !defined(HAVE_STRTONUM) /*libbsd*/
+extern long long strtonum(const char *numstr, long long minval, long long maxval, const char **errstrp);
+#if !defined(LIBCOMPAT_SOURCE)
+#define HAVE_STRTONUM
+#endif
+#endif
+
+#if !defined(HAVE_STRTOK_R)
+extern char * strtok_r(char *s, const char *delim, char **lasts);
+#if !defined(LIBCOMPAT_SOURCE)
+#define HAVE_STRTOK_R
+#endif
+#endif
+
+#if !defined(HAVE_BZERO)
+extern void bzero(void *s, size_t len);
+#if !defined(LIBCOMPAT_SOURCE)
+#define HAVE_BZERO
+#endif
+#endif
+
+#if !defined(HAVE_EXPLICIT_BZERO)
+extern void explicit_bzero(void *s, size_t len);
+#if !defined(LIBCOMPAT_SOURCE)
+#define HAVE_EXPLICIT_BZERO
+#endif
+#endif
+
+#if !defined(HAVE_PUTW)
+extern int putw(int w, FILE *fp);
+#if !defined(LIBCOMPAT_SOURCE)
+#define HAVE_PUTW
+#endif
+#endif
+
+#if !defined(HAVE_GETW)
+extern int getw(FILE *fp);
+#if !defined(LIBCOMPAT_SOURCE)
+#define HAVE_GETW
+#endif
+#endif
+
+#if !defined(HAVE_INDEX)
+extern char *index(const char *s, int c);
+#if !defined(LIBCOMPAT_SOURCE)
+#define HAVE_INDEX
+#endif
+#endif
+
+#if !defined(HAVE_RINDEX)
+extern char *rindex(const char *s, int c);
+#if !defined(LIBCOMPAT_SOURCE)
+#define HAVE_RINDEX
+#endif
+#endif
+
+#if !defined(HAVE_MKSTEMP)
+extern int mkstemp(char *path);
+#if !defined(LIBCOMPAT_SOURCE)
+#define HAVE_MKSTEMP
+#endif
+#endif
+
+#if !defined(HAVE_MKTEMP)
+extern char *mktemp(char *path);
+#if !defined(LIBCOMPAT_SOURCE)
+#define HAVE_MKTEMP
+#endif
+#endif
+
+extern char *xmktemp(char *path, char *result, size_t length);
+
+#if !defined(HAVE_GETLINE)
+extern int /*ssize_t*/ getdelim(char **buf, size_t *bufsiz, int delimiter, FILE *fp);
+extern int /*ssize_t*/ getline(char **buf, size_t *bufsiz, FILE *fp);
+#if !defined(LIBCOMPAT_SOURCE)
+#define HAVE_GETLINE
+#endif
+#endif
+
+#endif /*LIBCOMPACT_H_INCLUDED*/
+
