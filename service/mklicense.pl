@@ -1,6 +1,6 @@
 #!/usr/bin/perl -w
 # -*- mode: perl; -*-
-# $Id: mklicense.pl,v 1.2 2020/06/28 22:44:23 cvsuser Exp $
+# $Id: mklicense.pl,v 1.3 2020/06/30 01:11:19 cvsuser Exp $
 #
 # Copyright (c) 2020, Adam Young.
 # All rights reserved.

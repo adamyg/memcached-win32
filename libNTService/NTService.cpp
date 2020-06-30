@@ -1,5 +1,5 @@
 #include <edidentifier.h>
-__CIDENT_RCSID(NTService_cpp, "$Id: NTService.cpp,v 1.2 2020/06/28 22:44:21 cvsuser Exp $")
+__CIDENT_RCSID(NTService_cpp, "$Id: NTService.cpp,v 1.3 2020/06/30 00:38:34 cvsuser Exp $")
 
 /* -*- mode: c; indent-width: 8; -*- */
 /*
@@ -235,7 +235,7 @@ int CNTService::ExecuteCommand(int argc, const char * const *argv, unsigned filt
                 if (argc > 1) {
                         return NTSERVICE_CMD_UNEXPECTED_ARG;
                 }
-                diags().finfo("%s Version %d.%d", m_szServiceName, m_iMajorVersion, m_iMinorVersion);
+                diags().finfo("%s Version %d.%d.%d", m_szServiceName, m_iMajorVersion, m_iMinorVersion, m_iReleaseVersion);
                 diags().finfo("Service is %s installed", IsInstalled() ? "currently" : "not");
                 return 1;
 
@@ -310,8 +310,8 @@ void CNTService::InstallArgumentsUsage()
         diags().finfo("      -U,--account=<user>             Account");
         diags().finfo("      -P,--password=<xxx>             Password");
         diags().finfo("      -D,--displayname=<xxx>          Display name");
-        diags().finfo("      -C,--description=\"text\"       Description/comment text");
-        diags().finfo("      -A,--arg=\"argument[=value]\"   Service argument; none or more");
+        diags().finfo("      -C,--description=\"text\"         Description/comment text");
+        diags().finfo("      -A,--arg=\"argument[=value]\"     Service argument; none or more");
         diags().finfo("      --grant                         Grant public access");
         diags().finfo("      --auto                          Auto start");
         diags().finfo("      --manual                        Manual start");
