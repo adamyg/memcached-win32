@@ -1,5 +1,5 @@
 #include <edidentifier.h>
-__CIDENT_RCSID(Service_cpp,"$Id: Service.cpp,v 1.5 2020/07/02 01:51:22 cvsuser Exp $")
+__CIDENT_RCSID(Service_cpp,"$Id: Service.cpp,v 1.6 2020/07/02 16:25:21 cvsuser Exp $")
 
 /* -*- mode: c; indent-width: 8; -*- */
 /*
@@ -12,8 +12,7 @@ __CIDENT_RCSID(Service_cpp,"$Id: Service.cpp,v 1.5 2020/07/02 01:51:22 cvsuser E
  *
  * The applications are free software: you can redistribute it
  * and/or modify it under the terms of the GNU General Public License as
- * published by the Free Software Foundation, either version 3 of the License,
- * or (at your option) any later version.
+ * published by the Free Software Foundation, version 3.
  *
  * Redistributions of source code must retain the above copyright
  * notice, and must be distributed with the license document above.
@@ -26,6 +25,7 @@ __CIDENT_RCSID(Service_cpp,"$Id: Service.cpp,v 1.5 2020/07/02 01:51:22 cvsuser E
  * This project is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * license for more details.
  * ==end==
  */
 
@@ -266,6 +266,7 @@ Service::ServiceRun()
             break;
         default:
             diags().fwarning("error waiting on stop event: %u", dwWait);
+            break;
         }
         Shutdown();
     }
@@ -541,20 +542,21 @@ Service::logger_body(PipeEndpoint *endpoint)
                     break;
                 case PipeEndpoint::EP_READING:
                     if (dwRead) {
-                        DWORD dwPopped = 0;
+                        const char *scan = endpoint->cursor;
+                        DWORD dwPopped = 0;     // note: first scan need only be against additional characters.
 
                         endpoint->pushed(dwRead);
                         for (const char *line = endpoint->buffer, *nl;
-                                    NULL != (nl = strchr(line, '\n')); line = nl) {
+                                    NULL != (nl = strchr(scan, '\n')); scan = line = nl) {
                             unsigned sz = nl - line;
 
                             if (sz) {
-                              //logger_.push(line, sz);
                                 ServiceDiags::LoggerAdapter::push(logger_, ServiceDiags::LoggerAdapter::LLNONE, line, sz);
                                 if (INVALID_HANDLE_VALUE != hStdout) {
                                     if (! WriteConsole(hStdout, line, sz + 1, NULL, NULL)) {
                                         CloseHandle(hStdout);
                                         hStdout = INVALID_HANDLE_VALUE;
+                                            //TODO: move into logger, as console may block.
                                     }
                                 }
                             }
@@ -569,7 +571,7 @@ Service::logger_body(PipeEndpoint *endpoint)
                         if (dwPopped) {         // pop consumed characters
                             endpoint->popped(dwPopped);
                         } else if (0 == endpoint->avail) {
-                          //logger_.push(endpoint->buffer, endpoint->size);
+                                                // otherwise on buffer full; flush
                             ServiceDiags::LoggerAdapter::push(logger_, ServiceDiags::LoggerAdapter::LLNONE, endpoint->buffer, endpoint->size);
                             if (INVALID_HANDLE_VALUE != hStdout) {
                                 WriteConsole(hStdout, endpoint->buffer, endpoint->size, NULL, NULL);
@@ -581,11 +583,13 @@ Service::logger_body(PipeEndpoint *endpoint)
                     }
                     break;
                 default:
+                    diags().ferror("unexpected endpoint state : %u", (unsigned)endpoint->state);
                     assert(false);
                     break;
                 }
             } else {
                 DWORD dwError = GetLastError();
+                diags().ferror("unexpected io completion : %u", (unsigned)dwError);
                 assert(false);
             }
 
@@ -608,6 +612,7 @@ Service::logger_body(PipeEndpoint *endpoint)
             // WAIT_IO_COMPLETION
             // WAIT_FAILED
             DWORD dwError = GetLastError();
+            diags().ferror("unexpected wait completion : %u", (unsigned)dwError);
             assert(false);
             break;                              // exit
         }
