@@ -1,5 +1,5 @@
 #include <edidentifier.h>
-__CIDENT_RCSID(gr_w32_dirent_c,"$Id: w32_dirent.c,v 1.1 2020/07/02 01:45:37 cvsuser Exp $")
+__CIDENT_RCSID(gr_w32_dirent_c,"$Id: w32_dirent.c,v 1.2 2020/07/02 16:25:17 cvsuser Exp $")
 
 /* -*- mode: c; indent-width: 4; -*- */
 /*
@@ -7,13 +7,13 @@ __CIDENT_RCSID(gr_w32_dirent_c,"$Id: w32_dirent.c,v 1.1 2020/07/02 01:45:37 cvsu
  *
  *      opendir, closedir, readdir, seekdir, rewindir, telldir
  *
- * Copyright (c) 2007, 2012 - 2018 Adam Young.
+ * Copyright (c) 2007, 2012 - 2020 Adam Young.
+ *
  * This file is part of memcached-win32.
  *
  * The applications are free software: you can redistribute it
  * and/or modify it under the terms of the GNU General Public License as
- * published by the Free Software Foundation, either version 3 of the License,
- * or (at your option) any later version.
+ * published by the Free Software Foundation, version 3.
  *
  * Redistributions of source code must retain the above copyright
  * notice, and must be distributed with the license document above.
@@ -26,6 +26,7 @@ __CIDENT_RCSID(gr_w32_dirent_c,"$Id: w32_dirent.c,v 1.1 2020/07/02 01:45:37 cvsu
  * This project is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * license for more details.
  * ==end==
  */
 

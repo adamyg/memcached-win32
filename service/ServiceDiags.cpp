@@ -1,5 +1,5 @@
 #include <edidentifier.h>
-__CIDENT_RCSID(ServiceDiags_cpp,"$Id: ServiceDiags.cpp,v 1.1 2020/07/02 01:51:22 cvsuser Exp $")
+__CIDENT_RCSID(ServiceDiags_cpp,"$Id: ServiceDiags.cpp,v 1.2 2020/07/02 16:25:21 cvsuser Exp $")
 
 /* -*- mode: c; indent-width: 8; -*- */
 /*
@@ -12,8 +12,7 @@ __CIDENT_RCSID(ServiceDiags_cpp,"$Id: ServiceDiags.cpp,v 1.1 2020/07/02 01:51:22
  *
  * The applications are free software: you can redistribute it
  * and/or modify it under the terms of the GNU General Public License as
- * published by the Free Software Foundation, either version 3 of the License,
- * or (at your option) any later version.
+ * published by the Free Software Foundation, version 3.
  *
  * Redistributions of source code must retain the above copyright
  * notice, and must be distributed with the license document above.
@@ -26,6 +25,7 @@ __CIDENT_RCSID(ServiceDiags_cpp,"$Id: ServiceDiags.cpp,v 1.1 2020/07/02 01:51:22
  * This project is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * license for more details.
  * ==end==
  */
 

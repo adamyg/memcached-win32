@@ -1,5 +1,5 @@
 #include <edidentifier.h>
-__CIDENT_RCSID(NTServiceConfig_cpp, "$Id: NTServiceConfig.cpp,v 1.2 2020/06/28 22:44:21 cvsuser Exp $")
+__CIDENT_RCSID(NTServiceConfig_cpp, "$Id: NTServiceConfig.cpp,v 1.3 2020/07/02 16:25:16 cvsuser Exp $")
 
 /* -*- mode: c; indent-width: 8; -*- */
 /*
@@ -8,12 +8,12 @@ __CIDENT_RCSID(NTServiceConfig_cpp, "$Id: NTServiceConfig.cpp,v 1.2 2020/06/28 2
  * Copyright (c) 2020, Adam Young.
  * All rights reserved.
  *
+ *
  * This file is part of memcached-win32.
  *
  * The applications are free software: you can redistribute it
  * and/or modify it under the terms of the GNU General Public License as
- * published by the Free Software Foundation, either version 3 of the License,
- * or (at your option) any later version.
+ * published by the Free Software Foundation, version 3.
  *
  * Redistributions of source code must retain the above copyright
  * notice, and must be distributed with the license document above.
@@ -26,6 +26,7 @@ __CIDENT_RCSID(NTServiceConfig_cpp, "$Id: NTServiceConfig.cpp,v 1.2 2020/06/28 2
  * This project is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * license for more details.
  * ==end==
  */
 

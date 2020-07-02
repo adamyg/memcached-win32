@@ -1,5 +1,5 @@
 /* -*- mode: c; indent-width: 4; -*-
- * $Id: pack1.h,v 1.2 2020/06/28 23:57:48 cvsuser Exp $
+ * $Id: pack1.h,v 1.3 2020/07/02 16:25:20 cvsuser Exp $
  * ==noguard==
  *
  * win32 declaration helpers
@@ -11,8 +11,7 @@
  *
  * The applications are free software: you can redistribute it
  * and/or modify it under the terms of the GNU General Public License as
- * published by the Free Software Foundation, either version 3 of the License,
- * or (at your option) any later version.
+ * published by the Free Software Foundation, version 3.
  *
  * Redistributions of source code must retain the above copyright
  * notice, and must be distributed with the license document above.
@@ -25,6 +24,7 @@
  * This project is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * license for more details.
  * ==end==
  *
  * Usage:
