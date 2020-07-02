@@ -1,11 +1,9 @@
 #include <edidentifier.h>
-__CIDENT_RCSID(gr_w32_reparse_c,"$Id: w32_reparse.c,v 1.2 2020/06/28 23:57:46 cvsuser Exp $")
+__CIDENT_RCSID(gr_w32_reparse_c,"$Id: w32_reparse.c,v 1.3 2020/07/02 01:45:37 cvsuser Exp $")
 
 /* -*- mode: c; indent-width: 4; -*- */
 /*
- * win32 directory access services ...
- *
- *      opendir, closedir, readdir, seekdir, rewindir, telldir
+ * reparse point utilises
  *
  * Copyright (c) 2007, 2012 - 2020 Adam Young.
  *

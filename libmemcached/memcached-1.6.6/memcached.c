@@ -488,11 +488,15 @@ static bool rbuf_switch_to_malloc(conn *c) {
  */
 static void conn_init(void) {
     /* We're unlikely to see an FD much higher than maxconns. */
+#if defined(WIN32PORT)
+    const int next_fd = 3;  /* dup(1) errors when no console */
+#else
     int next_fd = dup(1);
     if (next_fd < 0) {
         perror("Failed to duplicate file descriptor\n");
         exit(1);
     }
+#endif
     int headroom = 10;      /* account for extra unexpected open FDs */
     struct rlimit rl;
 
@@ -506,7 +510,9 @@ static void conn_init(void) {
                         "falling back to maxconns\n");
     }
 
+#if !defined(WIN32PORT)
     close(next_fd);
+#endif
 
     if ((conns = calloc(max_fds, sizeof(conn *))) == NULL) {
         fprintf(stderr, "Failed to allocate connection structures\n");

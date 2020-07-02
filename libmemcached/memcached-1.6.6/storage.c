@@ -573,12 +573,22 @@ int start_storage_compact_thread(void *arg) {
 struct extstore_conf_file *storage_conf_parse(char *arg, unsigned int page_size) {
     struct extstore_conf_file *cf = NULL;
     char *b = NULL;
+#if defined(WIN32PORT) //handle leading drive within path.
+    const unsigned drive = ((isascii(arg[0]) && arg[1] == ':') ? 2 : 0);
+    char *p = strtok_r(arg + drive, ":", &b);
+#else
     char *p = strtok_r(arg, ":", &b);
+#endif
     char unit = 0;
     uint64_t multiplier = 0;
     int base_size = 0;
+
     if (p == NULL)
         goto error;
+#if defined(WIN32PORT)
+    p -= drive;
+#endif
+
     // First arg is the filepath.
     cf = calloc(1, sizeof(struct extstore_conf_file));
     cf->file = strdup(p);

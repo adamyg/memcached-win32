@@ -35,6 +35,10 @@
 int
 daemonize(int nochdir, int noclose)
 {
+    HWND console = GetConsoleWindow();
+    if (console) {
+        ShowWindow(console, SW_HIDE /*SW_MINIMIZE*/);
+    }
     (void) nochdir;
     (void) noclose;
     return 0;
