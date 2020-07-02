@@ -119,6 +119,7 @@ VPATH=		../libNTService
 CPPSOURCES=\
 	main.cpp\
 	Service.cpp\
+	ServiceDiags.cpp\
 	NTService.cpp\
 	NTServiceReg.cpp\
 	NTServiceConfig.cpp\

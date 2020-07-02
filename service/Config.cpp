@@ -101,8 +101,8 @@ Config::Load(const std::string &file, std::string &errmsg)
                         }
 
                         // key [= value]
-                        const size_t eq = line.find_first_of("=");
-                        if (eq == std::string::npos) {
+                        const size_t eq = line.find_first_of(" =");
+                        if (eq == std::string::npos || line[eq] == ' ') {
                                 ltrim(line);
                                 if (! line.empty()) {
                                         values->insert(line, "");

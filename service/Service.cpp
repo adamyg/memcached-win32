@@ -1,5 +1,5 @@
 #include <edidentifier.h>
-__CIDENT_RCSID(Service_cpp,"$Id: Service.cpp,v 1.3 2020/06/30 01:11:18 cvsuser Exp $")
+__CIDENT_RCSID(Service_cpp,"$Id: Service.cpp,v 1.4 2020/06/30 12:04:18 cvsuser Exp $")
 
 /* -*- mode: c; indent-width: 8; -*- */
 /*
@@ -37,6 +37,7 @@ __CIDENT_RCSID(Service_cpp,"$Id: Service.cpp,v 1.3 2020/06/30 01:11:18 cvsuser E
 #include <io.h>
 
 #include "Service.h"                            // public header
+#include "ServiceDiags.h"
 #include "Arguments.h"
 
 #include "../libmemcached/libmemcached.h"
@@ -177,10 +178,13 @@ Service::~Service() {
 void
 Service::Start(const struct Options &options)
 {
-  //SetDiagnostics(DefaultDiagnosticsIO::Get());
+    SetDiagnostics(ServiceDiags::Get(logger_));
     options_ = options;
     options_.conf = ResolveRelative(options.conf.empty() ? "./memcached.conf" : options.conf.c_str());
-    if (! CNTService::GetConsoleMode()) options_.daemon_mode = true /*implied*/;
+
+    if (! CNTService::GetConsoleMode()) {
+        options_.logger = true;                 // implied.
+    }
     CNTService::Start();
 }
 
@@ -192,20 +196,22 @@ Service::ConfigLogger()
     char szValue[1024];
     int ret;
 
-    ret = ConfigGet("logger_file", szValue, sizeof(szValue));
+    // TODO: logger section [logger.service|port]
+
+    ret = ConfigGet("logger_path", szValue, sizeof(szValue));
     profile.base_path(ResolveRelative(ret ? szValue : "./logs/memcached_service.log"));
 
-    ConfigGet("logger_age", szValue, sizeof(szValue));
-    profile.time_period(szValue);
+    if (ConfigGet("logger_age", szValue, sizeof(szValue)))
+        profile.time_period(szValue);
 
-    ConfigGet("logger_size", szValue, sizeof(szValue));
-    profile.size_limit(szValue);
+    if (ConfigGet("logger_size", szValue, sizeof(szValue)))
+        profile.size_limit(szValue);
 
-    ConfigGet("logger_lines", szValue, sizeof(szValue));
-    profile.line_limit(szValue);
+    if (ConfigGet("logger_lines", szValue, sizeof(szValue)))
+        profile.line_limit(szValue);
 
-//  ConfigGet("logger_purge", szValue, sizeof(szValue));
-//  profile.purge_days(szValue);                // TODO
+    if (ConfigGet("logger_purge", szValue, sizeof(szValue)))
+        profile.purge_period(szValue);
 
     if (! logger_.start(profile)) {
         CNTService::LogError(true, "unable to initialise logger <%s>", profile.base_path());
@@ -280,7 +286,17 @@ Service::Initialise()
     snprintf(pipe_name_, sizeof(pipe_name_)-1,  // stderr/stdout sink
         "\\\\.\\pipe\\memcache_service_stdlog.%u", (unsigned)(::GetCurrentProcessId() * ::GetTickCount()));
 
-    {   PipeEndpoint *endpoint = 0;
+    if (options_.daemon_mode) {
+        if (HWND console = GetConsoleWindow()) {
+            ShowWindow(console, SW_HIDE /*SW_MINIMIZE*/);
+          //FreeConsole();                      // detach from console.
+                // unfortunately FreeConsole() unconditionally closes any associated handles, resulting in
+                // invalid handle exceptions during freopen()'s; there is no portable work-around.
+        }
+    }
+
+    if (options_.logger) {
+        PipeEndpoint *endpoint = 0;
 
         if (unsigned ret = NewPipeEndpoint(pipe_name_, endpoint)) {
             diags().ferror("unable to open redirect pipe <%s>: %u", pipe_name_, ret);
@@ -302,19 +318,19 @@ Service::Initialise()
             return -1;
         }
         ::Sleep(200);
-    }
 
-    if (NULL == (stderr_stream = freopen(pipe_name_, "wb", stderr)) ||
-            -1 == setvbuf(stderr, NULL, _IOFBF, 1024)) {
-        diags().ferror("unable to open redirect stderr <%s>: %m", pipe_name_);
-        return -1;
-    }
-
-    if (::WaitNamedPipeA(pipe_name_, 30 * 1000)) {
-        if (NULL == (stdout_stream = freopen(pipe_name_, "wb", stdout)) ||
-                -1 == setvbuf(stdout, NULL, _IOFBF, 1024)) {
-            diags().ferror("unable to open redirect stdout <%s>: %m", pipe_name_);
+        if (NULL == (stderr_stream = freopen(pipe_name_, "wb", stderr)) ||
+                -1 == setvbuf(stderr, NULL, _IOFBF, 1024)) {
+            diags().ferror("unable to open redirect stderr <%s>: %m", pipe_name_);
             return -1;
+        }
+
+        if (::WaitNamedPipeA(pipe_name_, 30 * 1000)) {
+            if (NULL == (stdout_stream = freopen(pipe_name_, "wb", stdout)) ||
+                    -1 == setvbuf(stdout, NULL, _IOFBF, 1024)) {
+                diags().ferror("unable to open redirect stdout <%s>: %m", pipe_name_);
+                return -1;
+            }
         }
     }
 
@@ -323,10 +339,6 @@ Service::Initialise()
     if (NULL == logger_stop_event_ || NULL == server_thread_) {
         diags().ferror("unable to create server thread: %M");
         return -1;
-    }
-
-    if (options_.daemon_mode) {
-        FreeConsole();                          // detach from console; if any.
     }
     return 0;
 }
@@ -429,6 +441,7 @@ Service::service_body()
                     Arguments::split(args, parameters, true);
                 }
             }
+
         } else {
             char options[1024];
             if (ConfigGet("options", options, sizeof(options))) {
@@ -485,7 +498,7 @@ Service::logger_body(PipeEndpoint *endpoint)
     endpoints[inst] = endpoint;                 // endpoint
     handles[++inst] = endpoint->ioevent;        // completion event
 
-    if (GetConsoleMode()) {
+    if (options_.console_output) {
         hStdout = CreateFileA("CONOUT$", GENERIC_WRITE, FILE_SHARE_WRITE, 0, OPEN_EXISTING, 0, NULL);
     }
 
@@ -535,9 +548,15 @@ Service::logger_body(PipeEndpoint *endpoint)
                                     NULL != (nl = strchr(line, '\n')); line = nl) {
                             unsigned sz = nl - line;
 
-                            logger_.push(line, sz);
-                            if (INVALID_HANDLE_VALUE != hStdout) {
-                                WriteConsole(hStdout, line, sz + 1, NULL, NULL);
+                            if (sz) {
+                              //logger_.push(line, sz);
+                                ServiceDiags::LoggerAdapter::push(logger_, ServiceDiags::LoggerAdapter::LLNONE, line, sz);
+                                if (INVALID_HANDLE_VALUE != hStdout) {
+                                    if (! WriteConsole(hStdout, line, sz + 1, NULL, NULL)) {
+                                        CloseHandle(hStdout);
+                                        hStdout = INVALID_HANDLE_VALUE;
+                                    }
+                                }
                             }
 
                             ++nl, ++sz;         // consume newline
@@ -550,7 +569,8 @@ Service::logger_body(PipeEndpoint *endpoint)
                         if (dwPopped) {         // pop consumed characters
                             endpoint->popped(dwPopped);
                         } else if (0 == endpoint->avail) {
-                            logger_.push(endpoint->buffer, endpoint->size);
+                          //logger_.push(endpoint->buffer, endpoint->size);
+                            ServiceDiags::LoggerAdapter::push(logger_, ServiceDiags::LoggerAdapter::LLNONE, endpoint->buffer, endpoint->size);
                             if (INVALID_HANDLE_VALUE != hStdout) {
                                 WriteConsole(hStdout, endpoint->buffer, endpoint->size, NULL, NULL);
                             }
@@ -565,6 +585,7 @@ Service::logger_body(PipeEndpoint *endpoint)
                     break;
                 }
             } else {
+                DWORD dwError = GetLastError();
                 assert(false);
             }
 
@@ -586,6 +607,7 @@ Service::logger_body(PipeEndpoint *endpoint)
         } else {
             // WAIT_IO_COMPLETION
             // WAIT_FAILED
+            DWORD dwError = GetLastError();
             assert(false);
             break;                              // exit
         }
@@ -663,7 +685,6 @@ Service::ConfigOpen(bool create /*= true*/)
 
         CNTService::LogError(true, "unable to open configuration <%s>: %s", path.c_str(), errmsg.c_str());
         diags().ferror("unable to open configuration <%s>: %s", path.c_str(), errmsg.c_str());
-
         return false;
     }
     return CNTService::ConfigOpen();

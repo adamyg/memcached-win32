@@ -64,8 +64,12 @@ static const struct option long_options[] = {   // long arguments
     { "version",        no_argument,        0,    'V'  },   //-V,--version
     { "daemon",         no_argument,        0,    'd'  },   //-d,--daemon
     { "delay",          no_argument,        NULL, 1001 },   //--start-delay
-    { "console",        no_argument,        NULL, 1002 },   //--console
-    { "noconsole",      no_argument,        NULL, 1003 },   //--noconsole
+    { "conmode",        no_argument,        NULL, 1002 },   //--conmode
+    { "no-conmode",     no_argument,        NULL, 1003 },   //--no-conmode
+    { "stdout",         no_argument,        NULL, 1004 },   //--stdout
+    { "no-stdout",      no_argument,        NULL, 1005 },   //--no-stdout
+    { "logger",         no_argument,        NULL, 1006 },   //--logger
+    { "no-logger",      no_argument,        NULL, 1007 },   //--no-logger
     { NULL }
     };
 
@@ -116,7 +120,7 @@ main(int argc, const char **argv)
                 options.port = port;
             }
             break;
-        case 'd':   //-d,--daemon
+        case 'd':   //-d,--daemon (hide console)
             options.daemon_mode = true;
             break;
         case 'N':   //-N,--noconfig
@@ -131,14 +135,26 @@ main(int argc, const char **argv)
         case 'V':   //-V,--version
             do_info = OVERSION;
             break;
-        case 1001:  //--delay-start
+        case 1001:  //--delay-start (debug support)
             options.delay_start = true;
             break;
-        case 1002:  //--console
+        case 1002:  //--conmode (debug support)
             console_mode = true;
             break;
-        case 1003:  //--notconsole
+        case 1003:  //--no-conmode (debug support)
             console_mode = false;
+            break;
+        case 1004:  //--stdout
+            options.console_output = true;
+            break;
+        case 1005:  //--no-stdout
+            options.console_output = false;
+            break;
+        case 1006:  //--logger
+            options.logger = true;
+            break;
+        case 1007:  //--no-logger
+            options.logger = false;
             break;
         case 1:     //verb -- first non optional argument
             verb = optarg;
@@ -225,7 +241,7 @@ main(int argc, const char **argv)
             return (1 == ret ? EXIT_SUCCESS : EXIT_FAILURE);
 
         } else {
-//          diags.fwarning("unexpected command <%s>, ignored", verb);
+            service.LogError(true, "unexpected command <%s>, ignored", verb);
         }
 
     } else {                                    // "memcached [service_options] -- [options]" or "memcached [options]"
@@ -286,6 +302,13 @@ help(void)
     printf("-Z, --config-file <file>  Configuration file.\n");
     printf("-N, --noconfig            Ignore service configuration file/registry.\n");
     printf("-p, --port=<num>          Service port; utilised for port specific configuration.\n");
+    printf("\n");
+
+    printf("Following are effective when running under a console:\n");
+    printf("\n");
+    printf("-d, --daemon              Hide console.\n");
+    printf("--no-logger               Control logger and associated stdout/sterr redirection.\n");
+    printf("--stdout                  Redirect to both logger and console.\n");
     printf("\n");
 
     printf("COMMANDS:\n\n");

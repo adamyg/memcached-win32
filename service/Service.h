@@ -1,9 +1,9 @@
 #pragma once
-#if !defined(SERVICE_H_INCLUDED)
+#ifndef SERVICE_H_INCLUDED
 #define SERVICE_H_INCLUDED
 /* -*- mode: c; indent-width: 8; -*- */
 /*
- * service adapter
+ * Service adapter
  *
  * Copyright (c) 2020, Adam Young.
  * All rights reserved.
@@ -46,7 +46,8 @@ class Service : public CNTService {
 public:
         struct Options {
                 Options() : argc(0), argv(NULL), arg0(NULL), port(0),
-                        ignore(false), daemon_mode(false), delay_start(false) {
+                        ignore(false), daemon_mode(false), delay_start(false),
+                        console_output(false), logger(true) {
                 }
                 int argc;
                 const char **argv;
@@ -54,6 +55,8 @@ public:
                 bool ignore;
                 bool daemon_mode;
                 bool delay_start;
+                bool console_output;
+                bool logger;
                 unsigned port;
                 std::string conf;
         };

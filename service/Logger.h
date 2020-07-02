@@ -1,5 +1,5 @@
 #pragma once
-#if !defined(LOGGER_H_INCLUDED)
+#ifndef LOGGER_H_INCLUDED
 #define LOGGER_H_INCLUDED
 /* -*- mode: c; indent-width: 8; -*- */
 /*
@@ -70,8 +70,9 @@ public:
         void base_path(const char *path);
         bool size_limit(const char *limit = 0);
         bool line_limit(const char *limit = 0);
-        bool time_period(const char *limit = 0);
+        bool time_period(const char *period = 0);
         void time_rounding(bool state, const char *epoch = 0);
+        bool purge_period(const char *period = 0);
 
         const char *base_path() const;
 
@@ -84,6 +85,7 @@ public:
         unsigned line_limit_;
         unsigned time_epoch_;
         bool time_rounding_;
+        unsigned purge_period_;
     };
 
 protected:
@@ -96,6 +98,8 @@ protected:
             { return (data_ != 0); }
         const char *data() const
             { return data_; }
+        void append(const void *buffer, size_t buflen);
+        void append_nl();
         void assign(const void *buffer, size_t buflen);
         void assign_nl(const void *buffer, size_t buflen);
         char *data()
@@ -127,6 +131,11 @@ public:
     // log to stderr as well, asynchronously (via streamer)
     static const unsigned CONSOLE_ASYNCHRONOUS = 0x04;
 
+    struct liovec {
+        void * liov_base;
+        size_t liov_len;
+    };
+
 public:
     Logger(unsigned flags = Logger::CONSOLE_DEFAULT);
     virtual ~Logger();
@@ -135,6 +144,7 @@ public:
     bool start(const Profile &profile);
     void stop();
     bool push(const char *buffer, size_t length);
+    bool pushv(const struct liovec *iov, int iovcnt);
 
 public:
     static bool parse_size_limit(const char *limit, unsigned &result);

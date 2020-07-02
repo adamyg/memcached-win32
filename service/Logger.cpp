@@ -32,6 +32,7 @@ __CIDENT_RCSID(Logger_cpp, "$Id: Logger.cpp,v 1.3 2020/06/30 01:11:18 cvsuser Ex
 #include <sys/stat.h>
 #include <sys/socket.h>
 #include <sys/time.h>
+#include <dirent.h>
 
 #include "Logger.h"                             // public header
 
@@ -71,6 +72,8 @@ namespace {
     class FileStream {
         BOOST_DELETED_FUNCTION(FileStream(const FileStream &))
         BOOST_DELETED_FUNCTION(FileStream& operator=(const FileStream &))
+
+        static const size_t suffixlen = (sizeof("_YYYYMMDD_HHMMSS.log") - 1);
 
     public:
         FileStream(const char *path = 0) :
@@ -159,14 +162,14 @@ LOGGER_TRACE(std::cout << "LOG: purged empty volume <" << filename_ << ">\n";)
                 //     or that they see an existing file on the associated volume.
                 //
 
-            if (create) {                           // attempt to create parent directory.
+            if (create) {                       // attempt to create parent directory.
                 char t_directoryname[_MAX_PATH];
 
                 strncpy(t_directoryname, (len ? t_fullpathname : basename.c_str()), sizeof(t_directoryname));
                 t_directoryname[sizeof(t_directoryname) - 1] = 0;
 
                 char *p1 = strrchr(t_directoryname, '/'), *p2 = strrchr(t_directoryname, '\\');
-                if (p1 || p2) {                     // remove trailing name.
+                if (p1 || p2) {                 // remove trailing name.
                     (p2 > p1 ? p2 : p1)[1] = 0;
 
                     if (::CreateDirectoryA(t_directoryname, NULL)) {
@@ -182,6 +185,24 @@ LOGGER_TRACE(std::cout << "LOG: purged empty volume <" << filename_ << ">\n";)
                 return true;
             }
             return false;
+        }
+
+        static bool split_path(const std::string &basename, std::string &dir, std::string &suffix, bool rmext = true) {
+            const size_t s = basename.find_last_of("/\\");
+            if (s != std::string::npos) {       // last separator
+                dir.assign(basename.c_str(), s);
+                suffix.assign(basename.c_str() + s + 1);
+            } else {
+                dir.assign(".");
+                suffix = basename;
+            }
+
+            if (rmext && suffix.length() > 4) { // remove trailing ".log"; if any
+                if (0 == _stricmp(&suffix[suffix.length() - 4], ".log")) {
+                    suffix.resize(suffix.length() - 4);
+                }
+            }
+            return true;
         }
 
         static std::string generate_log_name(const std::string &basename, const time_t now) {
@@ -205,11 +226,14 @@ LOGGER_TRACE(std::cout << "LOG: purged empty volume <" << filename_ << ">\n";)
         }
 
         static time_t parse_timestamp(const std::string &name) {
-            const size_t suffixlen = (sizeof("_YYYYMMDD_HHMMSS.log") - 1);
+            return parse_timestamp(name.c_str(), name.length());
+        }
+
+        static time_t parse_timestamp(const char *name, size_t namelen) {
             struct std::tm tm = {0};
 
-            if (name.length() < suffixlen ||
-                    6 != std::sscanf(name.c_str() + (name.length() - suffixlen), "_%4u%2u%2u_%2u%2u%2u.log",
+            if (namelen < suffixlen ||
+                    6 != std::sscanf(name + (namelen - suffixlen), "_%4u%2u%2u_%2u%2u%2u.log",
                             &tm.tm_year, &tm.tm_mon, &tm.tm_mday, &tm.tm_hour, &tm.tm_min, &tm.tm_sec) ||
                         tm.tm_year < 1900 || tm.tm_year > 2099 ||
                         tm.tm_mon  < 1 || tm.tm_mon  > 12 ||
@@ -221,6 +245,51 @@ LOGGER_TRACE(std::cout << "LOG: purged empty volume <" << filename_ << ">\n";)
             tm.tm_mon -= 1;                     // Month (0 - 11; January = 0).
 
             return timegm(&tm);
+        }
+
+        static int purge_logs(const std::string &basename, const time_t now, unsigned period) {
+            const time_t expired = now - period;
+            std::string dir, prefix;
+            int ret = -1;
+            DIR *d;
+
+            // iterate directory
+
+            if (split_path(basename, dir, prefix) && dir.length() < _MAX_PATH) {
+                if (NULL != (d = opendir(dir.c_str()))) {
+
+                    char fullname[_MAX_PATH * 2] = {0};
+                    struct dirent *entry;
+
+                    memcpy(fullname, dir.c_str(), dir.length());
+                    fullname[dir.length()] = '/';
+                    ret = 0;
+
+                    while (NULL != (entry = readdir(d))) {
+                        const char *name = entry->d_name;
+
+                        if (name[0] == '.') {
+                            if (0 == strcmp(name, ".") || 0 == strcmp(name, "..")) {
+                                continue;
+                            }
+                        }
+
+                        if (entry->d_namlen == (prefix.length() + suffixlen)) {
+                            if (0 == strncmp(name, prefix.c_str(), prefix.length())) {
+                                const time_t timestamp =
+                                    parse_timestamp(name, entry->d_namlen);
+                                if (timestamp > 0 && timestamp < expired) {
+                                    strcpy(fullname + dir.length() + 1, name);
+                                    _unlink(fullname);
+                                    ++ret;
+                                }
+                            }
+                        }
+                    }
+                    closedir(d);
+                }
+            }
+            return ret;
         }
 
     private:
@@ -244,6 +313,24 @@ LOGGER_TRACE(std::cout << "LOG: purged empty volume <" << filename_ << ">\n";)
 
 /////////////////////////////////////////////////////////////////////////////////////////
 //  Buffer cursor
+
+void
+Logger::BufferCursor::append(const void *buffer, size_t buflen) {
+    assert(is_valid());
+    assert(buffer && buflen);
+    assert((size_ + buflen) <= reserved_);
+    memcpy(data_ + size_, buffer, buflen);
+    size_ += buflen;
+}
+
+
+void
+Logger::BufferCursor::append_nl() {
+    assert(is_valid());
+    assert((size_ + 1) <= reserved_);
+    data_[size_++] = '\n';
+}
+
 
 void
 Logger::BufferCursor::assign(const void *buffer, size_t buflen) {
@@ -341,7 +428,7 @@ public:
     };
 
 public:
-    LoggerImpl() : thread_handle_(0) {
+    LoggerImpl() : thread_handle_(0), roll_time_(0), purge_time_(0) {
         wake_event_ = ::CreateEventA(NULL, FALSE /*auto*/, FALSE, NULL);
         stop_event_ = ::CreateEventA(NULL, TRUE /*manual*/, FALSE, NULL);
     }
@@ -365,10 +452,11 @@ public:
         FileStream::resolve_path(profile.base_path_, profile_.base_path_, true);
 
 LOGGER_TRACE(std::cout << "LOG: starting\n";)
-LOGGER_TRACE(std::cout << "LOG: base path:   " << profile_.base_path_   << "\n";)
-LOGGER_TRACE(std::cout << "LOG: roll period: " << profile_.time_period_ << " seconds\n";)
-LOGGER_TRACE(std::cout << "LOG: size limit:  " << profile_.size_limit_  << " bytes\n";)
-LOGGER_TRACE(std::cout << "LOG: item limit:  " << profile_.line_limit_  << "\n";)
+LOGGER_TRACE(std::cout << "LOG: base path:    " << profile_.base_path_    << "\n";)
+LOGGER_TRACE(std::cout << "LOG: roll period:  " << profile_.time_period_  << " seconds\n";)
+LOGGER_TRACE(std::cout << "LOG: size limit:   " << profile_.size_limit_   << " bytes\n";)
+LOGGER_TRACE(std::cout << "LOG: item limit:   " << profile_.line_limit_   << "\n";)
+LOGGER_TRACE(std::cout << "LOG: purge period: " << profile_.purge_period_ << "\n";)
 
         stream_.open(FileStream::generate_log_name(profile_.base_path_, now).c_str());
         if (stream_.is_open()) {
@@ -377,6 +465,7 @@ LOGGER_TRACE(std::cout << "LOG: item limit:  " << profile_.line_limit_  << "\n";
 
             ::ResetEvent(stop_event_);
             roll_time_ = roll_time(now, profile.time_period_);
+            if (profile.purge_period_) purge_time_ = roll_time(now, profile.purge_period_  / 2);
             thread_handle_ =
                 ::CreateThread(NULL, 0, __consumer_thread, (LPVOID)this, 0, NULL);
             return true;
@@ -398,8 +487,10 @@ LOGGER_TRACE(std::cout << "LOG: item limit:  " << profile_.line_limit_  << "\n";
                 (BufferCursor *)malloc(sizeof(Logger::BufferCursor) + buflen))) {
             // TODO: pull from a buffer/circular pool.
 
+            cursor->size_ = 0;
             cursor->data_ = (char *)(cursor + 1);
             cursor->reserved_ = buflen;
+            cursor->parent_ = NULL;
         }
         return cursor;
     }
@@ -461,10 +552,12 @@ public:
     void
     __consumer() {
         HANDLE events[2] = { stop_event_, wake_event_ };
+        time_t last_purge = 0;
         bool term = false;
 
 LOGGER_TRACE(std::cout << "LOG: open <" << stream_.filename() << ">, created " << time_to_string(stream_.created()) << ", size " << stream_.size() << "\n";)
 LOGGER_TRACE(std::cout << "LOG: next roll time " << time_to_string(roll_time_) << ", now " << time_to_string(time(NULL)) << std::endl;)
+LOGGER_TRACE(if (purge_time_) std::cout << "LOG: next purge time " << time_to_string(purge_time_) << ", now " << time_to_string(time(NULL)) << std::endl;)
 
         while (! term) {
             if (WAIT_OBJECT_0 ==                // TODO: align sleep with roll_time
@@ -472,16 +565,16 @@ LOGGER_TRACE(std::cout << "LOG: next roll time " << time_to_string(roll_time_) <
 LOGGER_TRACE(std::cout << "LOG: termination signaled" << std::endl;)
                 term = true;                    // termination, otherwise wake.
             }
-            consumer_drain();
+            consumer_purge(consumer_drain());
         }
         consumer_drain();
     }
 
 private:
-    void
+    time_t
     consumer_drain() {
         BufferQueue t_queue;
-        time_t now = 0;
+        time_t last_purge = 0, now = 0;
         unsigned block = 0;
 
         queue_.steal(t_queue);
@@ -500,7 +593,7 @@ LOGGER_TRACE(std::cout << "LOG: draining: " << t_queue.size() << std::endl;)
                     std::fwrite(current->data(), current->size(), 1, stderr);
                 }
 
-                if (0 == (++block & 0x1f)) {
+                if (0 == (++block & 0x1f)) {    // periodic check
                     if (consumer_check(now = time(NULL))) {
                         consumer_roll(now);
                     }
@@ -520,6 +613,7 @@ LOGGER_TRACE(std::cout << "LOG: draining, complete" << std::endl;)
         if (consumer_check(now = time(NULL))) {
             consumer_roll(now);
         }
+        return now;
     }
 
     bool
@@ -545,6 +639,20 @@ LOGGER_TRACE(std::cout << "LOG: open <" << stream_.filename() << ">\n";)
 LOGGER_TRACE(std::cout << "LOG: next roll time " << time_to_string(roll_time_) << ", now " << time_to_string(now) << std::endl;)
     }
 
+    void
+    consumer_purge(const time_t now) {
+        if (0 == purge_time_ || now < purge_time_)
+            return;
+
+        const time_t timestamp = (now > purge_time_ ? purge_time_ : now);
+            // Align with current purge_time if exceeed.
+
+        stream_.purge_logs(profile_.base_path_, timestamp, profile_.purge_period_);
+        purge_time_ = roll_time(timestamp, profile_.purge_period_ / 2);
+
+LOGGER_TRACE(std::cout << "LOG: next purge time " << time_to_string(purge_time_) << ", now " << time_to_string(now) << std::endl;)
+    }
+
 private:
     HANDLE thread_handle_;
     HANDLE wake_event_, stop_event_;
@@ -552,6 +660,7 @@ private:
     Profile profile_;
     FileStream stream_;
     time_t roll_time_;
+    time_t purge_time_;
 };
 
 
@@ -561,7 +670,7 @@ private:
 Logger::Profile::Profile() :
         toconsole_(false),
         size_limit_(DEF_SIZE_LIMIT), time_period_(DEF_TIME_LIMIT), line_limit_(0),
-        time_epoch_(0), time_rounding_(false)
+        time_epoch_(0), time_rounding_(false), purge_period_(0)
 {
     base_path_ = "./logs/logger.log";           // FIXME
 }
@@ -615,14 +724,14 @@ Logger::Profile::size_limit(const char *limit)
 
 
 bool
-Logger::Profile::time_period(const char *limit)
+Logger::Profile::time_period(const char *period)
 {
-    if (! limit) {
+    if (! period) {
         time_period_ = DEF_TIME_LIMIT;          // default
         return true;
     }
 
-    if (! parse_time_limit(limit, time_period_)) {
+    if (! parse_time_limit(period, time_period_)) {
         return false;                           // pase error
     }
 
@@ -658,6 +767,22 @@ Logger::Profile::time_rounding(bool state, const char *epoch)
             time_epoch_ = 0;                    // midnight
         }
     }
+}
+
+
+bool
+Logger::Profile::purge_period(const char *period)
+{
+    if (! period) {
+        purge_period_ = 0;                      // default; none
+        return true;
+    }
+
+    if (! parse_time_limit(period, purge_period_)) {
+        return false;                           // pase error
+    }
+
+    return true;
 }
 
 
@@ -709,11 +834,13 @@ syslog_hook(void *self, int op, int pri, const char *msg, size_t msglen)
 }
 
 
+#if (XXX)   //move into a non-member util function.
 void
 Logger::attach_to_syslog()
 {
-//  setlogproxy(&syslog_hook, (void *) this);
+    setlogproxy(&syslog_hook, (void *) this);
 }
+#endif
 
 
 bool
@@ -743,6 +870,55 @@ Logger::push(const char *buffer, size_t buflen)
     if ((flags_ & Logger::CONSOLE_SYNCHRONOUS) || // as well to console.
             (!ret && (flags_ & Logger::CONSOLE_DEFAULT))) { // no error/default.
         std::fwrite(buffer, buflen, 1, stderr);
+        if (need_nl) {
+            std::fputc('\n', stderr);
+        }
+    }
+
+    return ret;
+}
+
+
+bool
+Logger::pushv(const struct liovec *iov, int iovcnt)
+{
+    if (iovcnt <= 0)
+        return true;
+
+    size_t buflen = 0, need_nl = 0;
+    bool ret = false;
+
+    for (int v = 0; v < iovcnt; ++v) {          // storage needs
+        if (size_t len = iov[v].liov_len) {
+            need_nl = (((const char *)iov[v].liov_base)[len - 1] != '\n');
+            buflen += len;
+        }
+    }
+
+    if (0 == buflen)
+        return false;
+
+    if (impl_) {                                // push to consumer.
+        BufferCursor *cursor(impl_->allocate(buflen + need_nl));
+        if (cursor && cursor->is_valid()) {
+            for (int v = 0; v < iovcnt; ++v) {
+                if (size_t len = iov[v].liov_len) {
+                    cursor->append(iov[v].liov_base, len);
+                }
+            }
+            if (need_nl) cursor->append_nl();
+            impl_->push(cursor);
+            ret = true;
+        }
+    }
+
+    if ((flags_ & Logger::CONSOLE_SYNCHRONOUS) || // as well to console.
+            (!ret && (flags_ & Logger::CONSOLE_DEFAULT))) { // no error/default.
+        for (int v = 0; v < iovcnt; ++v) {
+            if (size_t len = iov[v].liov_len) {
+                std::fwrite(iov[v].liov_base, len, 1, stderr);
+            }
+        }
         if (need_nl) {
             std::fputc('\n', stderr);
         }
@@ -869,3 +1045,4 @@ Logger::parse_time_limit(const char *limit, unsigned &result)
 }
 
 //end
+
