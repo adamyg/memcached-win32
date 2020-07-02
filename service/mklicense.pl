@@ -1,6 +1,6 @@
 #!/usr/bin/perl -w
 # -*- mode: perl; -*-
-# $Id: mklicense.pl,v 1.3 2020/06/30 01:11:19 cvsuser Exp $
+# $Id: mklicense.pl,v 1.4 2020/07/02 16:50:41 cvsuser Exp $
 #
 # Copyright (c) 2020, Adam Young.
 # All rights reserved.
@@ -56,6 +56,7 @@ while (<INPUT>) {
         chomp;
         print OUTPUT ",\n"
                 if ($lines++);
+        s/\"/\\\"/g;
         print OUTPUT "\t\"$_\"";
         last if (/END OF TERMS AND CONDITIONS/);
         }

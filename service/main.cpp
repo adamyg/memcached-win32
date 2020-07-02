@@ -344,8 +344,6 @@ license(void)
         printf("%s\n", service_license[i]);
     }
 
-    printf("\n\nThis product includes software developed by the\n");
-    printf("\n\tUniversity of California, Berkeley and its contributors.\n");
     for (unsigned i = 0; i < _countof(bsd_license); ++i) {
         printf("%s\n", bsd_license[i]);
     }
