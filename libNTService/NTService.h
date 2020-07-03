@@ -7,7 +7,6 @@
  * Copyright (c) 2020, Adam Young.
  * All rights reserved.
  *
- *
  * This file is part of memcached-win32.
  *
  * The applications are free software: you can redistribute it

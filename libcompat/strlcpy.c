@@ -13,9 +13,9 @@
  * ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF
  * OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
  */
- 
+
 #include "libcompat.h"
- 
+
 #include <sys/types.h>
 #include <string.h>
 
@@ -25,7 +25,7 @@
  * Returns strlen(src); if retval >= siz, truncation occurred.
  */
 #if !defined(HAVE_STRLCPY)
- 
+
 size_t
 strlcpy(char *dst, const char *src, size_t siz)
 {

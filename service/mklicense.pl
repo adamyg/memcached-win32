@@ -1,14 +1,13 @@
 #!/usr/bin/perl -w
 # -*- mode: perl; -*-
-# $Id: mklicense.pl,v 1.4 2020/07/02 16:50:41 cvsuser Exp $
+# $Id: mklicense.pl,v 1.5 2020/07/03 20:32:11 cvsuser Exp $
 #
 # Copyright (c) 2020, Adam Young.
 # All rights reserved.
 #
 # The applications are free software: you can redistribute it
 # and/or modify it under the terms of the GNU General Public License as
-# published by the Free Software Foundation, either version 3 of the License,
-# or (at your option) any later version.
+# published by the Free Software Foundation, version 3.
 #
 # Redistributions of source code must retain the above copyright
 # notice, and must be distributed with the license document above.

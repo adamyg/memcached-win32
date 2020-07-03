@@ -1,7 +1,7 @@
 /*
  *  config.h.in.  Generated from configure.ac by autoheader.
- */                
- 
+ */
+
 #if defined(_WIN32)
 #if defined(NDEBUG)                             // non-assert
 #if defined(_DEBUG)

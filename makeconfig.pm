@@ -1,4 +1,4 @@
-# $Id: makeconfig.pm,v 1.1 2020/06/28 21:30:05 cvsuser Exp $
+# $Id: makeconfig.pm,v 1.2 2020/07/03 20:32:10 cvsuser Exp $
 # Makefile generation under Win32.
 # -*- perl; tabs: 8; indent-width: 4; -*-
 # Automake emulation for non-unix environments.
@@ -9,8 +9,7 @@
 #
 # The applications are free software: you can redistribute it
 # and/or modify it under the terms of the GNU General Public License as
-# published by the Free Software Foundation, either version 3 of the License,
-# or (at your option) any later version.
+# published by the Free Software Foundation, version 3.
 #
 # Redistributions of source code must retain the above copyright
 # notice, and must be distributed with the license document above.

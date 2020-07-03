@@ -2,6 +2,7 @@ memcached-win32 - Windows memcached service.
 Copyright (c) 1998 - 2020, Adam Young.
 All rights reserved.
 
+See memcached_service --license
 
 The applications are free software: you can redistribute it
 and/or modify it under the terms of the GNU General Public License as

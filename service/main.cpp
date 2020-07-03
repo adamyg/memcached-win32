@@ -235,8 +235,10 @@ main(int argc, const char **argv)
             }
 
             if (ret < 0) {                      // command line error.
-                diags.ferror("\nsee '%s %shelp' for more details",
-                        (verb ? verb : "rlogind"), (verb ? "" : "--"));
+                if (ret != NTSERVICE_CMD_HELP) {
+                    diags.ferror("\nsee '%s %shelp' for more details",
+                            (verb ? verb : "memcached_service"), (verb ? "" : "--"));
+                }
             }
             return (1 == ret ? EXIT_SUCCESS : EXIT_FAILURE);
 
@@ -313,7 +315,7 @@ help(void)
 
     printf("COMMANDS:\n\n");
     printf("version                   Service version information.\n");
-    printf("install                   Install rlogind as a service; see 'install help' for details.\n");
+    printf("install                   Install memcached as a service; see 'install help' for details.\n");
     printf("uninstall                 Uninstall as a service.\n");
     printf("config <attribute>        Config service attributes; see 'config help' for details.\n");
     printf("control <action>          Service control functions; see 'control help' for details\n");

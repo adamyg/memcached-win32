@@ -1,15 +1,14 @@
 #!/usr/bin/perl -w
 # -*- mode: perl; -*-
-# $Id: buildinfo.pl,v 1.2 2020/06/28 21:46:21 cvsuser Exp $
-# grief buildinfo generation
+# $Id: buildinfo.pl,v 1.3 2020/07/03 20:32:10 cvsuser Exp $
+# buildinfo generation
 #
 # Copyright Adam Young 2018-2020
 # All rights reserved.
 #
 # The applications are free software: you can redistribute it
 # and/or modify it under the terms of the GNU General Public License as
-# published by the Free Software Foundation, either version 3 of the License,
-# or (at your option) any later version.
+# published by the Free Software Foundation, version 3.
 #
 # Redistributions of source code must retain the above copyright
 # notice, and must be distributed with the license document above.

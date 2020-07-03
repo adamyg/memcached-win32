@@ -8,8 +8,7 @@
  *
  *  The applications are free software: you can redistribute it
  *  and/or modify it under the terms of the GNU General Public License as
- *  published by the Free Software Foundation, either version 3 of the License,
- *  or (at your option) any later version.
+ *  published by the Free Software Foundation, version 3.
  *
  *  Redistributions of source code must retain the above copyright
  *  notice, and must be distributed with the license document above.
@@ -66,8 +65,12 @@ pthread_mutex_init(pthread_mutex_t *mutex, const pthread_mutexattr_t *attr)
         return EINVAL;
     }
     assert(0xBABEFACE != mutex->flag);          /* trap double init, yet *could* be a false positive */
-    mutex->lock = 1;
-    InitializeCriticalSection(&mutex->cs);      /* initialisation is unconditional */
+    mutex->lock = 1;                            /* initialisation is unconditional */
+#if defined(MUTEX_SPINCOUNT)
+    InitializeCriticalSectionAndSpinCount(&mutex->cs, MUTEX_SPINCOUNT);
+#else
+    InitializeCriticalSection(&mutex->cs);
+#endif
     mutex->flag = 0xBABEFACE;
     mutex->nest = 0;
     mutex->lock = 0;
@@ -84,7 +87,11 @@ mutex_init_once(pthread_mutex_t *mutex)
     if (0xBABEFACE != mutex->flag) {
         satomic_lock(&mutex->lock);
         if (0xBABEFACE != mutex->flag) {        /* runtime initialisation */
+#if defined(MUTEX_SPINCOUNT)
+            InitializeCriticalSectionAndSpinCount(&mutex->cs, MUTEX_SPINCOUNT);
+#else
             InitializeCriticalSection(&mutex->cs);
+#endif
             mutex->flag = 0xBABEFACE;
             mutex->nest = 0;
         }

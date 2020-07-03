@@ -3,7 +3,7 @@
 //
 
 #include "libcompat.h"
-		    
+
 //   NAME
 //
 //      putw - put a word on a stream (LEGACY)

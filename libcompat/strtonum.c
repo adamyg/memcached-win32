@@ -14,7 +14,7 @@
  * ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF
  * OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
  */
- 
+
 #include "libcompat.h"
 
 #include <errno.h>
@@ -65,7 +65,7 @@ strtonum(const char *numstr, long long minval, long long maxval, const char **er
 	return (ll);
 }
 
-#else 
+#else
 extern void __stdlibrary_has_strtonum(void);
 
 void
