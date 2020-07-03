@@ -1,5 +1,5 @@
 #include <edidentifier.h>
-__CIDENT_RCSID(NTServiceControl_cpp, "$Id: NTServiceControl.cpp,v 1.3 2020/07/02 16:25:16 cvsuser Exp $")
+__CIDENT_RCSID(NTServiceControl_cpp, "$Id: NTServiceControl.cpp,v 1.4 2020/07/03 20:32:10 cvsuser Exp $")
 
 /* -*- mode: c; indent-width: 8; -*- */
 /*
@@ -7,7 +7,6 @@ __CIDENT_RCSID(NTServiceControl_cpp, "$Id: NTServiceControl.cpp,v 1.3 2020/07/02
  *
  * Copyright (c) 2020, Adam Young.
  * All rights reserved.
- *
  *
  * This file is part of memcached-win32.
  *
@@ -102,7 +101,8 @@ int CNTServiceControl::ExecuteCommand(int argc, const char * const *argv, unsign
                 UpdateDacl();
                 return 1;
 
-        } else if (0 == (filter & 0x100) && 0 == _stricmp(cmd, "help")) {
+        } else if (0 == (filter & 0x100) &&
+                        (0 == _stricmp(cmd, "help") || 0 == _stricmp(cmd, "--help"))) {
                 if (argc > 1) {
                         return NTSERVICE_CMD_UNEXPECTED_ARG;
                 }

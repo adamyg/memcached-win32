@@ -1,6 +1,6 @@
 /*
  *  libmemcached
- */             
+ */
 
 #ifdef __cplusplus
 extern "C" {
@@ -13,4 +13,4 @@ extern void memcached_signal_stop(int verbose);
 }
 #endif
 
-/*end*/ 
+/*end*/

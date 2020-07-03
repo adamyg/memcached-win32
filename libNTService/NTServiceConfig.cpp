@@ -1,5 +1,5 @@
 #include <edidentifier.h>
-__CIDENT_RCSID(NTServiceConfig_cpp, "$Id: NTServiceConfig.cpp,v 1.3 2020/07/02 16:25:16 cvsuser Exp $")
+__CIDENT_RCSID(NTServiceConfig_cpp, "$Id: NTServiceConfig.cpp,v 1.4 2020/07/03 20:32:10 cvsuser Exp $")
 
 /* -*- mode: c; indent-width: 8; -*- */
 /*
@@ -7,7 +7,6 @@ __CIDENT_RCSID(NTServiceConfig_cpp, "$Id: NTServiceConfig.cpp,v 1.3 2020/07/02 1
  *
  * Copyright (c) 2020, Adam Young.
  * All rights reserved.
- *
  *
  * This file is part of memcached-win32.
  *
@@ -148,7 +147,8 @@ int CNTServiceConfig::ExecuteCommand(int argc, const char * const *argv, unsigne
 //      } else if (0 == (filter & 0x400) && 0 == _stricmp(cmd, "import")) {
                 // Import configuration; from an ini.
 
-        } else if (0 == (filter & 0x100) && 0 == _stricmp(cmd, "help")) {
+        } else if (0 == (filter & 0x100) &&
+                        (0 == _stricmp(cmd, "help") || 0 == _stricmp(cmd, "--help"))) {
                 if (argc > 1) {                 // Note: uninstall perferred
                     return NTSERVICE_CMD_UNEXPECTED_ARG;
                 }
