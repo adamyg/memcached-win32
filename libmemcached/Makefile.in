@@ -89,10 +89,10 @@ RMDFLAGS=	-rf
 #########################################################################################
 # Targets
 
-VERSION=	1.6.6
-VPATH=		memcached-1.6.6
-#VERSION=	1.6.15
-#VPATH=		memcached-1.6.15
+#VERSION=	1.6.6
+#VPATH=		memcached-1.6.6
+VERSION=	1.6.15
+VPATH=		memcached-1.6.15
 
 LIBROOT=	memcached
 
@@ -127,6 +127,13 @@ LIBCSOURCES=\
 	crc32c.c \
 	storage.c \
 	slab_automove_extstore.c
+
+ifeq ("$(VERSION)","1.6.15")
+LIBCSOURCES+=\
+	base64.c\
+	proto_bin.c\
+	proto_text.c
+endif
 
 LIBHSOURCES=\
 	memcached.h \
