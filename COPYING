@@ -2,6 +2,14 @@ memcached-win32 - Windows memcached service.
 Copyright (c) 1998 - 2020, Adam Young.
 All rights reserved.
 
+This product includes software developed by:
+
+- Danga Interactive, Inc.
+- University of California, Berkeley and its contributors.
+- NetBSD Foundation, Inc.
+- Kungliga Tekniska Hgskolan, Royal Institute of Technology, Stockholm, Sweden.
+- Todd C. Miller <Todd.Miller@courtesan.com>.
+
 See memcached_service --license
 
 The applications are free software: you can redistribute it
@@ -20,3 +28,4 @@ This project is distributed in the hope that it will be useful,
 but WITHOUT ANY WARRANTY; without even the implied warranty of
 MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
 license for more details.
+

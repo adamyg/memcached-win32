@@ -1,11 +1,11 @@
 #include <edidentifier.h>
-__CIDENT_RCSID(gr_w32_errno_c,"$Id: w32_errno.c,v 1.3 2020/07/02 16:25:18 cvsuser Exp $")
+__CIDENT_RCSID(gr_w32_errno_c,"$Id: w32_errno.c,v 1.4 2022/06/12 16:08:43 cvsuser Exp $")
 
 /* -*- mode: c; indent-width: 4; -*- */
 /*
  * win32 errno mapping support
  *
- * Copyright (c) 1998 - 2020, Adam Young.
+ * Copyright (c) 1998 - 2022, Adam Young.
  * All rights reserved.
  *
  * This file is part of memcached-win32.
@@ -366,7 +366,7 @@ static const int    xlaterrno[] = {
     ENOSPC,         /* 314 (0x13A)    ERROR_DISK_RESOURCES_EXHAUSTED           The physical resources of this disk have been exhausted. */
     EINVAL,         /* 315 (0x13B)    ERROR_INVALID_TOKEN                      The token representing the data is invalid. */
     ENOSYS,         /* 316 (0x13C)    ERROR_DEVICE_FEATURE_NOT_SUPPORTED       The device does not support the command feature. */
-    -1,             /* 317 (0x13D)    ERROR_MR_MID_NOT_FOUND                   The system cannot find message text for message number 0x % 1 in the message file for %2. */
+    -1,             /* 317 (0x13D)    ERROR_MR_MID_NOT_FOUND                   The system cannot find message text for message number 0x%1 in the message file for %2. */
     ENOENT,         /* 318 (0x13E)    ERROR_SCOPE_NOT_FOUND                    The scope specified was not found. */
     -1,             /* 319 (0x13F)    ERROR_UNDEFINED_SCOPE                    The Central Access Policy specified is not defined on the target machine. */
     EINVAL,         /* 320 (0x140)    ERROR_INVALID_CAP                        The Central Access Policy obtained from Active Directory is invalid. */
@@ -422,6 +422,9 @@ w32_errno_cnv(unsigned rc)
                 t_errno = EPIPE; break;
             case ERROR_PIPE_LISTENING:          /* 536          - Waiting for a process to open the other end of the pipe. */
                 t_errno = EPIPE; break;
+#if defined(__MINGW32__) || !defined(ERROR_CANT_WAIT)
+#define ERROR_CANT_WAIT 554
+#endif
             case ERROR_CANT_WAIT:               /* 554 (0x22A)  - Used to indicate that an operation cannot continue without blocking for I/O. */
                 t_errno = EAGAIN; break;
             case ERROR_OPERATION_ABORTED:       /* 995          - The I/O operation has been aborted because of either a thread exit or an application request. */
@@ -771,7 +774,9 @@ w32_strerror(int errnum)
 //  case EPROTOTYPE:        /*136*/ err = "Protype error"; break;
     case ETIME:             /*137*/ err = "Stream ioctl timeout"; break;
 //  case ETIMEDOUT:         /*138*/ err = "Connection timed out"; break;
+#if defined(ETXTBSY)
     case ETXTBSY:           /*139*/ err = "Text file busy"; break;
+#endif
 //  case EWOULDBLOCK:       /*140*/ err = "Operation would block"; break;
 
     /* BSD/SysV messages */
@@ -867,7 +872,7 @@ w32_strerror(int errnum)
 #endif
 
     default:
-        _snprintf(errbuffer, sizeof(errbuffer),
+        _snprintf(errbuffer, sizeof(errbuffer), "%s [%d]",
              (errnum >= WSABASEERR ? "unknown winsock error" : "unknown error"), errnum);
         err = errbuffer;
         break;

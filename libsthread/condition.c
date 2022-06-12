@@ -1,7 +1,7 @@
 /*
  *  Simple win32 threads - conditions.
  *
- *  Copyright (c) 2020, Adam Young.
+ *  Copyright (c) 2020 - 2022, Adam Young.
  *  All rights reserved.
  *
  *  This file is part of memcached-win32.
@@ -34,11 +34,22 @@
 #include <assert.h>
 #include <unistd.h>
 
+#if !defined(HAVE_PTHREAD_H)
+
 #include "timespec.h"
 #include "satomic.h"
 
+#if !defined(ETIMEDOUT)
+#define ETIMEDOUT EAGAIN
+#endif
 
-static inline DWORD
+#pragma comment(lib, "Kernel32.lib")
+    //#if defined(__WATCOMC__)
+    //see: CONDITION_VARIABLE_INIT = {0}
+    //#define InitializeConditionVariable(__cv) memset(__cv,0,sizeof(*__cv))
+    //#endif
+
+static __inline DWORD
 timespec_to_msec(const struct timespec *a)
 {
     return (DWORD)(a->tv_sec * 1000) + (a->tv_nsec / 1000000);
@@ -52,10 +63,11 @@ pthread_cond_destroy(pthread_cond_t *cond)
         return EINVAL;
     }
     if (cond->flag) {
-        assert(0xBABEFACE == cond->flag);
+        assert(COND_MAGIC == cond->flag);
         cond->flag = 0;
+        return 0;
     }
-    return 0;
+    return EINVAL;
 }
 
 
@@ -66,26 +78,26 @@ pthread_cond_init(pthread_cond_t *cond, const pthread_condattr_t *attr)
     if (NULL == cond) {
         return EINVAL;
     }
-    assert(0xBABEFACE != cond->flag);           /* trap double init, yet *could* be a false positive */
+    assert(COND_MAGIC != cond->flag);           /* trap double init, yet *could* be a false positive */
     cond->lock = 1;
     InitializeConditionVariable(&cond->cv);     /* initialisation is unconditional */
-    cond->flag = 0xBABEFACE;
+    cond->flag = COND_MAGIC;
     cond->lock = 0;
     return 0;
 }
 
 
-static void __inline
+static __inline void
 condition_init_once(pthread_cond_t *cond)
 {
 #if !defined(NDEBUG)
     const long lock = cond->lock; assert(0 == lock || 1 == lock);
 #endif
-    if (0xBABEFACE != cond->flag) {
+    if (COND_MAGIC != cond->flag) {
         satomic_lock(&cond->lock);
-        if (0xBABEFACE != cond->flag) {
+        if (COND_MAGIC != cond->flag) {
             InitializeConditionVariable(&cond->cv);
-            cond->flag = 0xBABEFACE;
+            cond->flag = COND_MAGIC;
         }
         satomic_unlock(&cond->lock);
     }
@@ -126,10 +138,13 @@ pthread_cond_wait(pthread_cond_t *cond, pthread_mutex_t *mutex)
     }
     condition_init_once(cond);
 
-    assert(0xBABEFACE == mutex->flag);          /* assumed to be initialised */
+    assert(MUTEX_MAGIC == mutex->flag);         /* assumed to be initialised */
     assert(1 == mutex->nest);                   /* must be locked once only */
-    --mutex->nest;
+    if (MUTEX_MAGIC != mutex->flag || 1 != mutex->nest) {
+        return EINVAL;
+    }
 
+    --mutex->nest;
     ret = SleepConditionVariableCS(&cond->cv, &mutex->cs, INFINITE);
     ++mutex->nest;
 
@@ -171,20 +186,26 @@ condition_wait(pthread_cond_t *cond, pthread_mutex_t *mutex, const struct timesp
             }
         }
 
-        assert(0xBABEFACE == mutex->flag);      /* assumed to be initialised */
+        assert(COND_MAGIC == mutex->flag);      /* assumed to be initialised */
         assert(1 == mutex->nest);               /* must be locked once only */
-        --mutex->nest;
+        if (MUTEX_MAGIC != mutex->flag || 1 != mutex->nest) {
+            return EINVAL;
+        }
 
+        --mutex->nest;
         ret = SleepConditionVariableCS(&cond->cv, &mutex->cs, timespec_to_msec(&then));
         ++mutex->nest;
 
         return (ret ? 0 : (GetLastError() == ERROR_TIMEOUT ? ETIMEDOUT : EINVAL));
     }
 
-    assert(0xBABEFACE == mutex->flag);          /* assumed to be initialised */
+    assert(COND_MAGIC == mutex->flag);          /* assumed to be initialised */
     assert(1 == mutex->nest);                   /* must be locked once only */
-    --mutex->nest;
+    if (MUTEX_MAGIC != mutex->flag || 1 != mutex->nest) {
+        return EINVAL;
+    }
 
+    --mutex->nest;
     ret = SleepConditionVariableCS(&cond->cv, &mutex->cs, INFINITE);
     ++mutex->nest;
 
@@ -204,5 +225,7 @@ pthread_cond_timedwait_relative_np(pthread_cond_t *cond, pthread_mutex_t *mutex,
 {
     return (condition_wait(cond, mutex, reltime, 1));
 }
+
+#endif /*HAVE_PTHREAD_H*/
 
 /*end*/

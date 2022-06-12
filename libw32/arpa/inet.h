@@ -1,7 +1,7 @@
 #ifndef LIBW32_ARPA_INET_H_INCLUDED
 #define LIBW32_ARPA_INET_H_INCLUDED
 #include <edidentifier.h>
-__CIDENT_RCSID(gr_libw32_arpa_inet_h,"$Id: inet.h,v 1.5 2017/01/29 02:22:52 cvsuser Exp $")
+__CIDENT_RCSID(gr_libw32_arpa_inet_h,"$Id: inet.h,v 1.1 2022/06/12 16:08:45 cvsuser Exp $")
 __CPRAGMA_ONCE
 
 /* -*- mode: c; indent-width: 4; -*- */

@@ -40,18 +40,17 @@
 int
 getw(FILE *fp)
 {
-        int x;
+	int x;
 
-        return (fread((void *)&x, sizeof(x), 1, fp) == 1 ? x : EOF);
+	return (fread((void *)&x, sizeof(x), 1, fp) == 1 ? x : EOF);
 }
 
 #else
 extern void __stdlibrary_has_getw(void);
 
 void
- __stdlibrary_has_getw(void)
+__stdlibrary_has_getw(void)
 {
 }
 
 #endif
-

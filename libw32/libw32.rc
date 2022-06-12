@@ -1,10 +1,11 @@
 /*
- * Copyright (c) 2016 - 2020 Adam Young.
+ * Copyright (c) 2016 - 2022 Adam Young.
  *
- * This file is part of the WinRSH/WinSSH project.
+ * This file is part of memcached-win32.
  *
- * The WinRSH/WinSSH project is free software: you can redistribute it
- * and/or modify it under the terms of the WinRSH/WinSSH project License.
+ * The applications are free software: you can redistribute it
+ * and/or modify it under the terms of the GNU General Public License as
+ * published by the Free Software Foundation, version 3.
  *
  * Redistributions of source code must retain the above copyright
  * notice, and must be distributed with the license document above.
@@ -14,10 +15,9 @@
  * the documentation and/or other materials provided with the
  * distribution.
  *
- * The WinRSH/WinSSH project is distributed in the hope that it will be useful,
+ * This project is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
- * License for more details.
  * ==end==
  */
 
@@ -54,7 +54,7 @@ BEGIN
 			VALUE "InternalName",	"libwin32.dll\0"
 
 			VALUE "LegalCopyright",
-				"Copyright (c) 2007 - 2020 Adam Young\0"
+				"Copyright (c) 2007 - 2022 Adam Young\0"
 
 			VALUE "OriginalFilename",
 				"libwin32." LIBW32_VERSION ".dll\0"
@@ -66,7 +66,7 @@ BEGIN
 				LIBW32_VERSION "\0"
 
 			VALUE "Comments",
-				"For more information visit https://sourceforge.net/p/mcwin32/\0"
+				"For more information visit https://github.com/adamyg/memcached-win32\0"
 		END
 	END
 	BLOCK "VarFileInfo"

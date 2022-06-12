@@ -60,7 +60,7 @@ strlcat(char *dst, const char *src, size_t siz)
 extern void __stdlibrary_has_strlcat(void);
 
 void
- __stdlibrary_has_strlcat(void)
+__stdlibrary_has_strlcat(void)
 {
 }
 

@@ -44,9 +44,8 @@ bzero(void *s, size_t len)
 extern void __stdlibrary_has_bzero(void);
 
 void
- __stdlibrary_has_bzero(void)
+__stdlibrary_has_bzero(void)
 {
 }
 
 #endif
-

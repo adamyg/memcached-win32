@@ -22,10 +22,6 @@
 #include <libcompat.h>
 #endif
 
-#if !defined(_CRT_NO_POSIX_ERROR_CODES)
-#define _CRT_NO_POSIX_ERROR_CODES
-#endif
-
 #if defined(_MSC_VER) || defined(__WATCOMC__)
 #if !defined(LIBW32_SOCKET_MAP_NATIVE)
 #define LIBW32_SOCKET_MAP_NATIVE 1              /* enable socket function mapping */
@@ -184,27 +180,6 @@
 /* Machine need alignment */
 #undef  NEED_ALIGN
 
-/* Name of package */
-#define PACKAGE             "memcached"
-
-/* Define to the address where bug reports for this package should be sent. */
-#define PACKAGE_BUGREPORT   ""
-
-/* Define to the full name of this package. */
-#define PACKAGE_NAME        "memmached"
-
-/* Define to the version of this package. */
-#define PACKAGE_VERSION     "1.6.6"
-
-/* Define to the full name and version of this package. */
-#define PACKAGE_STRING      PACKAGE_NAME " - " PACKAGE_VERSION
-
-/* Define to the one symbol short name of this package. */
-#define PACKAGE_TARNAME     ""
-
-/* Define to the home page for this package. */
-#define PACKAGE_URL         ""
-
 /* The size of `void *', as computed by sizeof. */
 #undef  SIZEOF_VOID_P
 
@@ -270,5 +245,8 @@
 
 extern int setgid(int groupid);
 extern int setuid(int uid);
+       
+#include "memcached_package.h"
+#include "libmemcached.h"
 
 /*end*/

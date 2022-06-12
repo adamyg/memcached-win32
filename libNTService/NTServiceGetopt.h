@@ -1,11 +1,11 @@
 #pragma once
 #ifndef NTSERVICEGETOPT_H_INCLUDED
 #define NTSERVICEGETOPT_H_INCLUDED
-
+/* -*- mode: c; indent-width: 8; -*- */
 /*
  * CNTService - Classic window services framework (tweaked).
  *
- * Copyright (c) 2020, Adam Young.
+ * Copyright (c) 2020 - 2022, Adam Young.
  * All rights reserved.
  *
  * This file is part of memcached-win32.
@@ -50,6 +50,7 @@
 #include <cstdio>
 #include <cstdlib>
 #include <cstring>
+#include <iostream>
 #include <cassert>
 
 #include "NTServiceIO.h"
@@ -242,7 +243,7 @@ private:
                 place_ = "";
 
                 if ((has_equal = strchr(arg, '=')) != NULL) {
-                        arglen = has_equal - arg;
+                        arglen = (int)(has_equal - arg);
                         ++has_equal;
                 } else {
                         arglen = (int)strlen(arg);
@@ -328,7 +329,7 @@ private:
                 if (!opterr_) return;
 
                 char buffer[1024];
-                if (arglen < 0) arglen = strlen(arg);
+                if (arglen < 0) arglen = (int)strlen(arg);
                 (void) _snprintf(buffer, sizeof(buffer), "%s: %s -- %.*s", progname(), msg, arglen, arg);
                 buffer[sizeof(buffer) - 1] = 0;
                 error_report(code, buffer);
@@ -351,6 +352,4 @@ private:
 
 }   //namspace NTService
 
-#endif  NTSERVICEGETOPT_HPP_INCLUDED
-
-
+#endif  //NTSERVICEGETOPT_HPP_INCLUDED

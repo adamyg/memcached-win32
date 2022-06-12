@@ -1,14 +1,14 @@
 #ifndef LIBW32_SYS_UIO_H_INCLUDED
 #define LIBW32_SYS_UIO_H_INCLUDED
 #include <edidentifier.h>
-__CIDENT_RCSID(gr_libw32_sys_uio_h,"$Id: uio.h,v 1.3 2020/07/02 16:25:21 cvsuser Exp $")
+__CIDENT_RCSID(gr_libw32_sys_uio_h,"$Id: uio.h,v 1.4 2022/06/12 16:08:46 cvsuser Exp $")
 __CPRAGMA_ONCE
 
 /* -*- mode: c; indent-width: 4; -*- */
 /*
  * win32 sys/uio.h
  *
- * Copyright (c) 1998 - 2020, Adam Young.
+ * Copyright (c) 1998 - 2022, Adam Young.
  * All rights reserved.
  *
  * This file is part of memcached-win32.
@@ -38,7 +38,11 @@ __CPRAGMA_ONCE
 #include <limits.h>         /* INT_MAX */
 
 #define IOV_MAX             64
+#if !defined(__MINGW32__)
+#if !defined(SSIZE_MAX)
 #define SSIZE_MAX           INT_MAX
+#endif
+#endif
 
 __BEGIN_DECLS
 

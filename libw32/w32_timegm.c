@@ -1,7 +1,7 @@
 #include <edidentifier.h>
-__CIDENT_RCSID(gr_w32_timegm_c,"$Id: w32_timegm.c,v 1.2 2020/06/28 23:57:47 cvsuser Exp $")
+__CIDENT_RCSID(gr_w32_timegm_c,"$Id: w32_timegm.c,v 1.3 2022/06/12 16:08:45 cvsuser Exp $")
 
-/* -*- mode: c; indent-width: 4; -*- */
+/* -*- mode: c; indent-width: 8; -*- */
 
 /*
  * Copyright (c) 1997 Kungliga Tekniska Hgskolan

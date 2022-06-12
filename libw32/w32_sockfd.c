@@ -1,10 +1,10 @@
 #include <edidentifier.h>
-__CIDENT_RCSID(gr_w32_sockfd_c,"$Id: w32_sockfd.c,v 1.3 2020/07/02 16:25:19 cvsuser Exp $")
+__CIDENT_RCSID(gr_w32_sockfd_c,"$Id: w32_sockfd.c,v 1.4 2022/06/12 16:08:45 cvsuser Exp $")
 
 /*
  * win32 socket file-descriptor support
  *
- * Copyright (c) 2007, 2012 - 2020 Adam Young.
+ * Copyright (c) 2007, 2012 - 2022 Adam Young.
  *
  * This file is part of memcached-win32.
  *
@@ -200,7 +200,7 @@ w32_issockfd(int fd, SOCKET *s)
                 t_s = (SOCKET)fd;
 
             } else if (fd >= x_fdlimit ||
-                    _get_osfhandle(fd) == (SOCKET)INVALID_HANDLE_VALUE) {
+                    _get_osfhandle(fd) == (int)INVALID_HANDLE_VALUE) {
                 t_s = (SOCKET)fd;               /* invalid assume socket; otherwise file */
             }
         }

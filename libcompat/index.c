@@ -17,9 +17,8 @@ index(const char *s, int c)
 extern void __stdlibrary_has_index(void);
 
 void
- __stdlibrary_has_index(void)
+__stdlibrary_has_index(void)
 {
 }
 
 #endif
-

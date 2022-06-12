@@ -1,8 +1,8 @@
 #!/usr/bin/perl -w
 # -*- mode: perl; -*-
-# $Id: mklicense.pl,v 1.5 2020/07/03 20:32:11 cvsuser Exp $
+# $Id: mklicense.pl,v 1.6 2022/06/12 16:12:44 cvsuser Exp $
 #
-# Copyright (c) 2020, Adam Young.
+# Copyright (c) 2020 - 2022, Adam Young.
 # All rights reserved.
 #
 # The applications are free software: you can redistribute it

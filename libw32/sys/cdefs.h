@@ -1,14 +1,14 @@
 #ifndef LIBW32_SYS_CDEFS_H_INCLUDED
 #define LIBW32_SYS_CDEFS_H_INCLUDED
 #include <edidentifier.h>
-__CIDENT_RCSID(gr_libw32_sys_cdefs_h,"$Id: cdefs.h,v 1.3 2020/07/02 16:25:20 cvsuser Exp $")
+__CIDENT_RCSID(gr_libw32_sys_cdefs_h,"$Id: cdefs.h,v 1.4 2022/06/12 16:08:45 cvsuser Exp $")
 __CPRAGMA_ONCE
 
 /* -*- mode: c; indent-width: 4; -*-
  *
  * win32 declaration helpers
  *
- * Copyright (c) 1998 - 2020, Adam Young.
+ * Copyright (c) 1998 - 2022, Adam Young.
  * All rights reserved.
  *
  * This file is part of memcached-win32.
@@ -43,7 +43,7 @@ __CPRAGMA_ONCE
 #pragma warning(disable:4115)   /* forward reference of struct * */
 #endif
 
-/* 
+/*
  *  Library binding.
  */
 #if !defined(LIBW32_API)
@@ -54,30 +54,45 @@ __CPRAGMA_ONCE
 
 #if defined(LIBW32_DYNAMIC)
     #if defined(LIBW32_LIBRARY)     /* library source */
-        #define LIBW32_API __declspec(dllexport)
+        #ifdef __GNUC__
+            #define LIBW32_API __attribute__((dllexport)) extern
+        #elif defined(__WATCOMC__)
+            #define LIBW32_API extern __declspec(dllexport)
+        #else
+            #define LIBW32_API __declspec(dllexport)
+        #endif
     #else
-        #define LIBW32_API __declspec(dllimport)
+        #ifdef __GNUC__
+            #define LIBW32_API __attribute__((dllimport)) extern
+        #elif defined(__WATCOMC__)
+            #define LIBW32_API extern __declspec(dllimport)
+        #else
+            #define LIBW32_API __declspec(dllimport)
+        #endif
     #endif
 
 #else   /*static*/
     #if defined(LIBW32_LIBRARY)     /* library source */
         #ifndef LIBW32_STATIC                   /* verify STATIC/DYNAMIC configuration */
-        #error  LIBW32 static library yet LIB32_STATIC not defined.
+            #error  LIBW32 static library yet LIB32_STATIC not defined.
         #endif
         #ifdef _WINDLL                          /*verify target configuration */
-        #error  LIBW32 static library yet _WINDLL defined.
+            #error  LIBW32 static library yet _WINDLL defined.
         #endif
     #endif
 #endif
 
 #ifndef LIBW32_API
 #define LIBW32_API
+#define LIBW32_VAR extern
+#else
+#define LIBW32_VAR LIBW32_API
 #endif
 
 #endif //!LIBW32_API
 
 
-/* 
+/*
  *  Binding:
  *
  * Usage:
@@ -290,7 +305,7 @@ __CPRAGMA_ONCE
 #define __dead2                 __attribute__((__noreturn__))
 #define __pure2                 __attribute__((__const__))
 #define __unused
-#elif __GNUC__ == 2 && __GNUC_MINOR__ >= 7
+#elif __GNUC__ >= 2 || (_GNUC__ == 2 && __GNUC_MINOR__ >= 7)
 #define __dead2                 __attribute__((__noreturn__))
 #define __pure2                 __attribute__((__const__))
 #define __unused                __attribute__((__unused__))

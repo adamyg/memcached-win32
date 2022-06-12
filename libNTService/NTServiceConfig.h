@@ -1,8 +1,9 @@
+/* -*- mode: c; indent-width: 8; -*- */
 /*
  * CNTService - Classic window services framework (tweaked).
  * Service config.
  *
- * Copyright (c) 2020, Adam Young.
+ * Copyright (c) 2020 - 2022, Adam Young.
  * All rights reserved.
  *
  * This file is part of memcached-win32.
@@ -26,34 +27,33 @@
  * ==end==
  */
 
-#include <string>
-
 #include "NTServiceIO.h"
+#include "NTString.h"
 
 class CNTServiceReg;
 
 class CNTServiceConfig {
-    CNTServiceConfig(const class CNTServiceConfig &) /*=delete*/;
-    CNTServiceConfig& operator=(const CNTServiceConfig &) /*=delete*/;
+        CNTServiceConfig(const class CNTServiceConfig &) /*=delete*/;
+        CNTServiceConfig& operator=(const CNTServiceConfig &) /*=delete*/;
 
 public:
-    CNTServiceConfig(const char *svcname, const char *coname,
-            NTService::IDiagnostics &diags = NTService::StdioDiagnosticsIO::Get());
-    ~CNTServiceConfig();
+        CNTServiceConfig(const char *svcname, const char *coname,
+                NTService::IDiagnostics &diags = NTService::StdioDiagnosticsIO::Get());
+        ~CNTServiceConfig();
 
-    NTService::IDiagnostics &diags() const;
-    int     ExecuteCommand(int argc, const char * const *argv, unsigned filter = 0);
-    void    Query();
-    void    Disable();
-    void    Enable();
-    void    UpdateDescription(const char *desc);
-    void    Delete();
-    int     SetAttribute(int argc, const char * const *argv);
+        NTService::IDiagnostics &diags() const;
+        int     ExecuteCommand(int argc, const char * const *argv, unsigned filter = 0);
+        void    Query();
+        void    Disable();
+        void    Enable();
+        void    UpdateDescription(const char *desc);
+        void    Delete();
+        int     SetAttribute(int argc, const char * const *argv);
 
 private:
-    NTService::IDiagnostics &diags_;
-    std::string svcName_;
-    std::string coName_;
+        NTService::IDiagnostics &diags_;
+        NTService::CString svcName_;
+        NTService::CString coName_;
 };
 
 //end

@@ -1,10 +1,6 @@
-#ifndef LIBW32_MSVC_ERRNO_H_INCLUDED
-#define LIBW32_MSVC_ERRNO_H_INCLUDED
 /*
- *  $Id: msvc_errno.h,v 1.3 2020/07/02 16:25:17 cvsuser Exp $
+ *  $Id: msvc_errno.h,v 1.4 2022/06/12 16:08:43 cvsuser Exp $
  *  MSVC errno filter
- *
- * This file is part of memcached-win32.
  *
  * This file is part of memcached-win32.
  *
@@ -71,4 +67,3 @@
 #undef EWOULDBLOCK      //140
 
 //end
-#endif /*LIBW32_MSVC_ERRNO_H_INCLUDED*/

@@ -1,11 +1,11 @@
 #include <edidentifier.h>
-__CIDENT_RCSID(gr_w32_socket_c,"$Id: w32_socket.c,v 1.3 2020/07/02 16:25:19 cvsuser Exp $")
+__CIDENT_RCSID(gr_w32_socket_c,"$Id: w32_socket.c,v 1.4 2022/06/12 16:08:44 cvsuser Exp $")
 
 /* -*- mode: c; indent-width: 4; -*- */
 /*
  * win32 socket () system calls
  *
- * Copyright (c) 1998 - 2020, Adam Young.
+ * Copyright (c) 1998 - 2022, Adam Young.
  * All rights reserved.
  *
  * This file is part of memcached-win32.
@@ -365,13 +365,13 @@ w32_recvfrom_fd(int fd, char *buf, int len, int flags,
 
 
 /*
- *  socksetblockingmode()
+ *  socknonblockingio()
  */
-LIBW32_API int         
-w32_sockblockingmode_fd(int fd, int enabled)
+LIBW32_API int
+w32_socknonblockingio_fd(int fd, int enabled)
 {
     SOCKET osf;
-    int ret;
+    int ret = 0;
 
     if ((osf = w32_sockhandle(fd)) == (SOCKET)INVALID_SOCKET) {
         ret = -1;
@@ -383,7 +383,28 @@ w32_sockblockingmode_fd(int fd, int enabled)
     }
     return ret;
 }
- 
+
+
+/*
+ *  sockinheritable
+ */
+LIBW32_API int
+w32_sockinheritable_fd(int fd, int enabled)
+{
+    SOCKET osf;
+    int ret = 0;
+
+    if ((osf = w32_sockhandle(fd)) == (SOCKET)INVALID_SOCKET) {
+        ret = -1;
+    } else {
+        if (! SetHandleInformation((HANDLE)osf, HANDLE_FLAG_INHERIT, enabled ? 1 : 0)) {
+            w32_sockerror();
+            ret = -1;
+        }
+    }
+    return ret;
+}
+
 
 /*
  *  sockwrite() system call; aka write() for sockets.
@@ -439,8 +460,11 @@ w32_sockclose_fd(int fd)
 #undef closesocket
     if ((osf = w32_sockhandle(fd)) == (SOCKET)INVALID_SOCKET) {
         ret = -1;
-    } else if ((ret = closesocket(osf)) == -1 /*SOCKET_ERROR*/) {
-        w32_sockerror();
+    } else {
+        w32_sockfd_close(fd, osf);
+        if ((ret = closesocket(osf)) == -1 /*SOCKET_ERROR*/) {
+            w32_sockerror();
+        }
     }
     return ret;
 }
@@ -479,4 +503,3 @@ w32_sockhandle(int fd)
 }
 
 /*end*/
-

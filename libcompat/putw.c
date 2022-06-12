@@ -44,9 +44,8 @@ putw(int w, FILE *fp)
 extern void __stdlibrary_has_putw(void);
 
 void
- __stdlibrary_has_putw(void)
+__stdlibrary_has_putw(void)
 {
 }
 
 #endif
-

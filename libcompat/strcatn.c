@@ -36,7 +36,7 @@ strcatn(register char *s1, register char *s2, register int n)
 extern void __stdlibrary_has_strcatn(void);
 
 void
- __stdlibrary_has_strcatn(void)
+__stdlibrary_has_strcatn(void)
 {
 }
 

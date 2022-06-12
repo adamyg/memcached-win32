@@ -69,7 +69,7 @@ strtonum(const char *numstr, long long minval, long long maxval, const char **er
 extern void __stdlibrary_has_strtonum(void);
 
 void
- __stdlibrary_has_strtonum(void)
+__stdlibrary_has_strtonum(void)
 {
 }
 

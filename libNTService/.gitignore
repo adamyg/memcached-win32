@@ -1,3 +1,7 @@
 Makefile
 Simple*.doc
+NTString_test.*
+*.bat
 *.err
+*.aps
+

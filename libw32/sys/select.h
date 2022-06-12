@@ -1,12 +1,12 @@
 #ifndef LIBW32_SYS_SELECT_H_INCLUDED
 #define LIBW32_SYS_SELECT_H_INCLUDED
 #include <edidentifier.h>
-__CIDENT_RCSID(gr_libw32_sys_select_h,"$Id: select.h,v 1.3 2020/07/02 16:25:20 cvsuser Exp $")
+__CIDENT_RCSID(gr_libw32_sys_select_h,"$Id: select.h,v 1.4 2022/06/12 16:08:46 cvsuser Exp $")
 __CPRAGMA_ONCE
 
 /* -*- mode: c; indent-width: 4; -*- */
 /*
- * Copyright (c) 1998 - 2020, Adam Young.
+ * Copyright (c) 2012 - 2022 Adam Young.
  * All rights reserved.
  *
  * This file is part of memcached-win32.
@@ -30,6 +30,9 @@ __CPRAGMA_ONCE
  * ==end==
  */
 
-#include <win32_include.h>                      /* winsock etc */
+#if !defined(_WINSOCK2_H)                       /* MINGW32 guard */
+#include <win32_include.h>                      /* winsock and windows.h guard */
+#endif
 
 #endif /*LIBW32_SYS_SELECT_H_INCLUDED*/
+
