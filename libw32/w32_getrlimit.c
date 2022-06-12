@@ -1,11 +1,11 @@
 #include <edidentifier.h>
-__CIDENT_RCSID(gr_w32_getrlimit_c,"$Id: w32_getrlimit.c,v 1.3 2020/07/02 16:25:18 cvsuser Exp $")
+__CIDENT_RCSID(gr_w32_getrlimit_c,"$Id: w32_getrlimit.c,v 1.4 2022/06/12 16:08:43 cvsuser Exp $")
 
 /* -*- mode: c; indent-width: 4; -*- */
 /*
  * win32 getrlimit() system calls
  *
- * Copyright (c) 2020, Adam Young.
+ * Copyright (c) 2020 - 2022, Adam Young.
  * All rights reserved.
  *
  * This file is part of memcached-win32.
@@ -137,6 +137,7 @@ ERRORS
     [EINVAL]
         The limit specified cannot be lowered because current usage is already higher than the limit.
 */
+
 int
 getrlimit(int resource, struct rlimit *rlp)
 {
@@ -145,11 +146,16 @@ getrlimit(int resource, struct rlimit *rlp)
     } else {
         switch (resource) {
         case RLIMIT_NOFILE:
+#if defined(__WATCOMC__)
+            rlp->rlim_cur = _grow_handles(_NFILES);
+            rlp->rlim_max = 2048; /*assumed limit*/
+#else
             rlp->rlim_cur = _getmaxstdio();
 #if defined(_MSC_VER) && (_MSC_VER >= 1920)
             rlp->rlim_max = 8192; /*2019, documented limit*/
 #else
             rlp->rlim_max = 2048; /*documented limit*/
+#endif
 #endif
             if (rlp->rlim_cur > rlp->rlim_max) {
                 rlp->rlim_max = rlp->rlim_cur;

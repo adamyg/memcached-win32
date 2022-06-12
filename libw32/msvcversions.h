@@ -1,14 +1,14 @@
 #ifndef LIBW32_MSVCVERSIONS_H_INCLUDED
 #define LIBW32_MSVCVERSIONS_H_INCLUDED
 #include <edidentifier.h>
-__CIDENT_RCSID(gr_msvcversions_h,"$Id: msvcversions.h,v 1.3 2020/07/02 16:25:17 cvsuser Exp $")
+__CIDENT_RCSID(gr_msvcversions_h,"$Id: msvcversions.h,v 1.4 2022/06/12 16:08:43 cvsuser Exp $")
 __CPRAGMA_ONCE
 
 /* -*- mode: c; indent-width: 4; -*- */
-/* $Id: msvcversions.h,v 1.3 2020/07/02 16:25:17 cvsuser Exp $
+/* $Id: msvcversions.h,v 1.4 2022/06/12 16:08:43 cvsuser Exp $
  * _MSC_VER definitions
  *
- * Copyright (c) 2017 - 2020, Adam Young.
+ * Copyright (c) 2017 - 2022, Adam Young.
  * All rights reserved.
  *
  * This file is part of memcached-win32.

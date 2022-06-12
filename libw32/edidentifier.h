@@ -2,7 +2,7 @@
 #define LIBW32_EDIDENTIFIER_H_INCLUDED
 
 /* -*- mode: c; indent-width: 4; -*- */
-/*  $Id: edidentifier.h,v 1.3 2020/07/02 16:25:17 cvsuser Exp $
+/*  $Id: edidentifier.h,v 1.4 2022/06/12 16:08:42 cvsuser Exp $
  *  Compiler specific object identify functionality.
  *
  *      __CIDENT(description)
@@ -11,7 +11,7 @@
  *
  *
  *
- * Copyright (c) 1998 - 2020, Adam Young.
+ * Copyright (c) 1998 - 2022, Adam Young.
  * All rights reserved.
  *
  * This file is part of memcached-win32.
@@ -191,4 +191,4 @@ static void __CIDENT_JOIN(RCSFN_,__tag)(const char *tag) {          \
 
 __CPRAGMA_ONCE
 
-#endif /*LIBW32_EDIDENTIFIER_H_INCLUDED*/
+#endif  /*LIBW32_EDIDENTIFIER_H_INCLUDED*/

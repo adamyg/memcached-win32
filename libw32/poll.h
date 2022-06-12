@@ -1,14 +1,14 @@
 #ifndef LIBW32_POLL_H_INCLUDED
 #define LIBW32_POLL_H_INCLUDED
 #include <edidentifier.h>
-__CIDENT_RCSID(gr_libw32_poll_h,"$Id: poll.h,v 1.3 2020/07/02 16:25:17 cvsuser Exp $")
+__CIDENT_RCSID(gr_libw32_poll_h,"$Id: poll.h,v 1.4 2022/06/12 16:08:43 cvsuser Exp $")
 __CPRAGMA_ONCE
 
 /* -*- mode: c; indent-width: 4; -*- */
 /*
  * win <poll.h>
  *
- * Copyright (c) 1998 - 2020, Adam Young.
+ * Copyright (c) 1998 - 2022, Adam Young.
  * All rights reserved.
  *
  * This file is part of memcached-win32.
@@ -48,7 +48,8 @@ struct w32_pollfd {
 
 #if !defined(POLLIN)
 #if (defined(_MSC_VER) && (_MSC_VER >= 1400)) || \
-        defined(__MINGW32__) || defined(__WATCOMC__)
+        defined(__WATCOMC__) || \
+        (defined(__MINGW32__) && (_WIN32_WINNT < 0x600 || !defined(__MINGW64_VERSION_MAJOR)))
 /*
  *  POLLRDNORM          Data on priority band 0 may be read.
  *  POLLRDBAND          Data on priority bands greater than 0 may be read.
@@ -63,11 +64,11 @@ struct w32_pollfd {
  *  POLLHUP             Device has been disconnected (revents only).
  *  POLLNVAL            Invalid fd member (revents only).
  */
-struct pollfd {
-    SOCKET              fd;
-    SHORT               events;
-    SHORT               revents;
-};
+typedef struct pollfd {
+    SOCKET  fd;
+    SHORT   events;
+    SHORT   revents;
+} WSAPOLLFD, *PWSAPOLLFD, *LPWSAPOLLFD;
 
 #define POLLRDNORM      0x0100
 #define POLLRDBAND      0x0200
@@ -79,7 +80,14 @@ struct pollfd {
 #define POLLERR         0x0001
 #define POLLHUP         0x0002
 #define POLLNVAL        0x0004
-#endif /*_MSC_VER || __MINGW32__ || __WATCOMC__ */
+
+#if defined(__MINGW32__)                /* missing definitions */
+__BEGIN_DECLS
+int WSAAPI WSAPoll(LPWSAPOLLFD fdArray, ULONG fds, INT timeout);
+__END_DECLS
+#endif
+
+#endif /*_MSC_VER || ___WATCOMC__ || _MINGW32__*/
 #endif /*POLLING*/
 
 __BEGIN_DECLS

@@ -2,6 +2,8 @@
 // compat_rindex - character string operations.
 //
 
+#include "libcompat.h"
+
 #include <sys/types.h>
 #include <string.h>
 
@@ -16,7 +18,7 @@ rindex(const char *s, int c)
 extern void __stdlibrary_has_rindex(void);
 
 void
- __stdlibrary_has_rindex(void)
+__stdlibrary_has_rindex(void)
 {
 }
 

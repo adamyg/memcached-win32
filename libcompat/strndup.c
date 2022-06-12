@@ -41,7 +41,7 @@ strndup(const char *str, size_t maxlen)
 extern void __stdlibrary_has_strndup(void);
 
 void
- __stdlibrary_has_strndup(void)
+__stdlibrary_has_strndup(void)
 {
 }
 

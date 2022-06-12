@@ -1,11 +1,11 @@
 #include <edidentifier.h>
-__CIDENT_RCSID(gr_w32_close_c,"$Id: w32_close.c,v 1.3 2020/07/02 16:25:17 cvsuser Exp $")
+__CIDENT_RCSID(gr_w32_close_c,"$Id: w32_close.c,v 1.4 2022/06/12 16:08:43 cvsuser Exp $")
 
 /* -*- mode: c; indent-width: 4; -*- */
 /*
  * win32 close() system calls
  *
- * Copyright (c) 1998 - 2020, Adam Young.
+ * Copyright (c) 1998 - 2022, Adam Young.
  * All rights reserved.
  *
  * This file is part of memcached-win32.
@@ -181,5 +181,5 @@ w32_close(int fildes)
     }
     return ret;
 }
-/*end*/
 
+/*end*/

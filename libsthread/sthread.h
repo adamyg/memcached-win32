@@ -10,7 +10,7 @@
  *      each of the pthreads functions that can return an error, POSIX.1-2001
  *      specifies that the function can never fail with the error EINTR.
  *
- *  Copyright (c) 2020, Adam Young.
+ *  Copyright (c) 2020 - 2022, Adam Young.
  *  All rights reserved.
  *
  *  This file is part of memcached-win32.
@@ -36,13 +36,37 @@
  *  ==end==
  */
 
+#if defined(HAVE_CONFIG_H)
+#include "w32config.h"
+#endif
+
 #if defined(_WIN32)
-#include <win32_include.h>
+#if defined(LIBSTHREAD_SOURCE) && !defined(_WIN32_WINNT)
+#define _WIN32_WINNT 0x0600
+#endif
+#include "win32_include.h"
 #endif
 
 #include <sys/utypes.h>
 #include <sys/uio.h>
 #include <time.h>
+
+#if defined(HAVE_PTHREAD_H)
+#include <pthread.h>
+
+#else /*!HAVE_PTHREAD_H*/
+
+#if defined(LIBSTHREAD_SOURCE) && (0)
+#define ENOTSUP ENOSYS
+#define ETIMEDOUT EAGAIN
+#endif
+
+#if defined(LIBSTHREAD_SOURCE)
+#define THREAD_MAGIC 0x21F00D1E
+#define MUTEX_MAGIC 0xBABEFAC1
+#define COND_MAGIC 0xBABEFAC2
+#define TLS_MAGIC 0xBABEFAC3
+#endif
 
 #ifdef __cplusplus
 extern "C" {
@@ -52,10 +76,7 @@ extern "C" {
  *  mutex's
  */
 
-typedef struct pthread_tag {
-    HANDLE handle;
-    DWORD id;
-} pthread_t;
+typedef struct pthread_instance *pthread_t;
 
 typedef struct pthread_attr_tag {
     size_t attributes[4];
@@ -63,18 +84,21 @@ typedef struct pthread_attr_tag {
 
 #define PTHREAD_CREATE_DETACHED 1
 #define PTHREAD_CREATE_JOINABLE 0
+#define PTHREAD_STACK_MIN 16384
 
 int pthread_attr_init(pthread_attr_t *attr);
 int pthread_attr_destroy(pthread_attr_t *attr);
-    //int pthread_attr_setdetachstate(pthread_attr_t *attr, int detachstate);
-    //int pthread_attr_getdetachstate(const pthread_attr_t *attr, int *detachstate);
-    //int pthread_attr_setstacksize(pthread_attr_t *attr, size_t stacksize);
-    //int pthread_attr_getstacksize(const pthread_attr_t *attr, size_t *stacksize);
-    //int pthread_attr_setstackaddr(pthread_attr_t *attr, void *stackaddr);
-    //int pthread_attr_getstackaddr(const pthread_attr_t *attr, void **stackaddr);
+int pthread_attr_setdetachstate(pthread_attr_t *attr, int detachstate);
+int pthread_attr_getdetachstate(const pthread_attr_t *attr, int *detachstate);
+int pthread_attr_setstacksize(pthread_attr_t *attr, size_t stacksize);
+int pthread_attr_getstacksize(const pthread_attr_t *attr, size_t *stacksize);
+int pthread_attr_setstackaddr(pthread_attr_t *attr, void *stackaddr);
+int pthread_attr_getstackaddr(const pthread_attr_t *attr, void **stackaddr);
 
 int pthread_create(pthread_t *thread, const pthread_attr_t *attr, void *(*start_routine)(void *), void *arg);
+int pthread_detach(pthread_t thread);
 int pthread_join(pthread_t thread, void **value_ptr);
+void pthread_exit(void *value_ptr);
 
 pthread_t pthread_self(void);
 int pthread_equal(pthread_t t1, pthread_t t2);
@@ -130,16 +154,59 @@ int pthread_cond_wait(pthread_cond_t *cond, pthread_mutex_t *mutex);
 int pthread_cond_timedwait(pthread_cond_t *cond, pthread_mutex_t *mutex, const struct timespec *abstime);
 int pthread_cond_timedwait_relative_np(pthread_cond_t *cond, pthread_mutex_t *mutex, const struct timespec *abstime);
 
+/*
+ *  read-write locks
+ */
+
+typedef struct pthread_rwlock_tag {
+    SRWLOCK srw;
+    DWORD owner;
+} pthread_rwlock_t;
+
+typedef struct pthread_rwlockattr_tag {
+    int attr;
+} pthread_rwlockattr_t;
+
+#if defined(RTL_SRWLOCK_INIT)
+#define PTHREAD_RWLOCK_INITIALIZER RTL_SRWLOCK_INIT
+#else
+#define PTHREAD_RWLOCK_INITIALIZER {0}
+#endif
+
+int pthread_rwlock_init(pthread_rwlock_t *rwlock, const pthread_rwlockattr_t *attr);
+int pthread_rwlock_destroy(pthread_rwlock_t *rwlock);
+int pthread_rwlock_rdlock(pthread_rwlock_t *rwlock);
+int pthread_rwlock_tryrdlock(pthread_rwlock_t *rwlock);
+int pthread_rwlock_wrlock(pthread_rwlock_t *rwlock);
+int pthread_rwlock_trywrlock(pthread_rwlock_t *rwlock);
+int pthread_rwlock_unlock(pthread_rwlock_t *rwlock);
+
 
 /*
  *  once
  */
+#if defined(__MINGW32__) && !defined(INIT_ONCE_STATIC_INIT)
+#define RTL_RUN_ONCE_INIT {0}
+typedef union _RTL_RUN_ONCE {
+    PVOID Ptr;
+} RTL_RUN_ONCE, *PRTL_RUN_ONCE;
+#define INIT_ONCE_STATIC_INIT RTL_RUN_ONCE_INIT
+typedef RTL_RUN_ONCE *PINIT_ONCE;
+typedef RTL_RUN_ONCE INIT_ONCE;
+typedef WINBOOL (WINAPI *PINIT_ONCE_FN) (PINIT_ONCE InitOnce, PVOID Parameter, PVOID *Context);
+WINBASEAPI WINBOOL WINAPI InitOnceExecuteOnce (PINIT_ONCE InitOnce, PINIT_ONCE_FN InitFn, PVOID Parameter, LPVOID *Context);
+#endif
 
 typedef struct pthread_once_tag {
     INIT_ONCE init_once;
 } pthread_once_t;
 
+#if defined(RTL_RUN_ONCE_INIT)
+#define PTHREAD_ONCE_INIT RTL_RUN_ONCE_INIT
+#else
 #define PTHREAD_ONCE_INIT {0}
+#endif
+#define PTHREAD_DESTRUCTOR_ITERATIONS 32
 
 int pthread_once(pthread_once_t *once_control, void (*init_routine)(void));
 
@@ -150,27 +217,68 @@ int pthread_once(pthread_once_t *once_control, void (*init_routine)(void));
 
 typedef DWORD pthread_key_t;
 
+#define PTHREAD_MAX_KEYS 64
+
 int pthread_key_create(pthread_key_t *key, void (*destr_function) (void *));
 int pthread_key_delete(pthread_key_t key);
 int pthread_setspecific(pthread_key_t key, const void *pointer);
-void * pthread_getspecific(pthread_key_t key);
+void *pthread_getspecific(pthread_key_t key);
+
+
+/*
+ *  spinlocks
+ */
+
+typedef struct  pthread_spinlock_tag {
+    long spin;
+    DWORD owner;
+} pthread_spinlock_t;
+
+#define PTHREAD_PROCESS_PRIVATE 0
+    //The spin lock is to be operated on only by threads in the same process as the thread that calls pthread_spin_init().
+#define PTHREAD_PROCESS_SHARED 1
+    //The spin lock may be operated on by any thread in any process that has access to the memory containing the lock.
+
+int pthread_spin_init(pthread_spinlock_t *lock, int pshared);
+int pthread_spin_destroy(pthread_spinlock_t *lock);
+int pthread_spin_lock(pthread_spinlock_t *lock);
+int pthread_spin_trylock(pthread_spinlock_t *lock);
+int pthread_spin_unlock(pthread_spinlock_t *lock);
 
 
 /*
  *  support
  */
 
+#if !defined(__MINGW32__)
 #if !defined(CLOCK_REALTIME)
 #define CLOCK_REALTIME 0
+    //System-wide realtime clock. Setting this clock requires appropriate privileges.
+#define CLOCK_MONOTONIC 1
+    //Clock that cannot be set and represents monotonic time since some unspecified starting point.
 extern int clock_gettime(int clockid, struct timespec *time_spec);
 #endif
-extern int usleep(useconds_t useconds);
-extern unsigned sleep(unsigned seconds);
+#endif
+
+#if !defined(__MINGW32__)
+#if !defined(USECONDS_T)
+#define USECONDS_T 1
+#ifdef _WIN64
+typedef unsigned long long useconds_t;
+#else
+typedef unsigned long useconds_t;
+#endif
+#endif /*USECONDS_T*/
+#endif /*__MINGW32__*/
+
+int usleep(useconds_t useconds);
+//libcompat
+//unsigned sleep(unsigned seconds);
 
 #ifdef __cplusplus
 }
 #endif
-
-#endif  /*STHREAD_H_INCLUDED*/
+#endif /*!HAVE_PTHREAD_H*/
+#endif /*STHREAD_H_INCLUDED*/
 
 /*end*/

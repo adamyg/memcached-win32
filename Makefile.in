@@ -1,9 +1,9 @@
 # -*- mode: mak; -*-
-# $Id: Makefile.in,v 1.3 2020/07/03 20:32:09 cvsuser Exp $
+# $Id: Makefile.in,v 1.4 2022/06/12 16:10:56 cvsuser Exp $
 # memcached-win32 makefile.
 #
 #
-# Copyright (c) 2020, Adam Young.
+# Copyright (c) 2020 - 2022, Adam Young.
 # All rights reserved.
 #
 # The applications are free software: you can redistribute it
@@ -78,7 +78,7 @@ libdir		= @libdir@
 datadir		= @datadir@
 
         # package directories
-pkgname		= winsh
+pkgname		= memcached-win32
 ifeq (rief,$(findstring rief,$(libexecdir)))
 pkglibexecdir	= $(libexecdir)
 pkglibdir	= $(libdir)
@@ -111,16 +111,61 @@ LP=		lib
 E=		.exe
 
 CLEAN=		*.bak *~ *.BAK *.swp *.tmp core *.core a.out
-XCLEAN=
+XCLEAN=		$(D_BIN)/*.map
 
 # Configuration
 
-ifeq ("$(BUILD_TYPE)","")	#default
-BUILD_TYPE=	debug
-MAKEFLAGS+=	BUILD_TYPE=debug
+ifeq ("win32","@build_os@")
+BUSYBOX=	@BUSYBOX@
+ifeq ($(BUSYBOX),busybox)
+BUSYBOX=	$(shell which busybox 2>/dev/null)
 endif
-ifneq ("$(BUILD_TYPE)","release")
+ECHO=		$(BUSYBOX) echo
+else
+ECHO=		echo
+endif
+
+ifeq ("$(BUILD_TYPE)","")	#default
+
+.PHONY:				help clean vclean build package
+help clean vclean build package:
+ifneq ("$(word 1,$(MAKECMDGOALS))","debug")
+ifneq ("$(word 1,$(MAKECMDGOALS))","release")
+	@$(ECHO) -n -e "\
+		|\n\
+		| make [release or debug] target \n\
+		|\n\
+		|	Build one or more of the following targets recursively within each sub-directory\n\
+		|	for the toolchain @TOOLCHAIN@. \n\
+		|\n\
+		| Targets: \n\
+		|\n\
+		|	build   - build everything. \n\
+		|	package - build package. \n\
+		|	clean   - delete everything which can be remade. \n\
+		|	vclean  - delete all. \n\
+		|	help    - command line usage. \n\
+		"
+endif
+endif
+	@echo .
+
+.PHONY:				release
+release:
+		$(MAKE) BUILD_TYPE=release $(filter-out release, $(MAKECMDGOALS))
+
+.PHONY:				debug
+debug:
+		$(MAKE) BUILD_TYPE=debug $(filter-out debug, $(MAKECMDGOALS))
+
+else	# BUILD_TYPE
+
+ifeq ("$(BUILD_TYPE)","debug")
 RTSUFFIX=d
+else
+ifneq ("$(BUILD_TYPE)","release")
+$(error invalid BUILD_TYPE; debug or release expected)
+endif
 endif
 
 # Directories
@@ -129,36 +174,29 @@ D_INC=		$(ROOT)/include
 D_BIN=		$(ROOT)/bin@TOOLCHAINEXT@/$(BUILD_TYPE)
 D_LIB=		$(ROOT)/lib@TOOLCHAINEXT@/$(BUILD_TYPE)
 D_OBJ=		$(ROOT)/objects@TOOLCHAINEXT@/$(BUILD_TYPE)
-LW=		$(D_LIB)/$(LP)
-
-D_ETC=		$(D_BIN)/etc
-D_PLUGIN=	$(D_BIN)/plugin
-D_SHARE=	$(D_BIN)/share
-D_DOC=		$(D_BIN)/doc
-D_LOCALE=	$(D_BIN)/locale
 
 # Compilers, programs
 
 CC=		@CC@
+CXX=		@CXX@
 AR=		@AR@
+RANLIB=		@RANLIB@
 RM=		@RM@
 RMDIR=		@RMDIR@
 CP=		@CP@
 RC=		@RC@
 PERL=		@PERL@
+LIBTOOL=	@LIBTOOL@
 TAR=		@TAR@
 INSTALL=	@INSTALL@
 INSTALL_PROGRAM=@INSTALL_PROGRAM@
 INSTALL_DATA=	@INSTALL_DATA@
 
+ifeq ("win32","@build_os@")
 INNO=		@INNO@
 ifeq ($(INNO),) # Inno5: allowing legacy XP installations
 INNO=		"C:/Program Files (x86)/Inno Setup 5/Compil32"
 endif
-
-BUSYBOX=	@BUSYBOX@
-ifeq ($(BUSYBOX),busybox)
-BUSYBOX=	$(shell which busybox 2>/dev/null)
 endif
 
 # Common flags
@@ -173,7 +211,7 @@ LDRELEASE=	@LDRELEASE@
 
 CINCLUDE=	-I. -I$(MCSOURCE) -I$(D_INC) -I$(D_INC)/glib-2.0 @CINCLUDE@
 
-CEXTRA=		@DEFS@ -DLIBW32_DYNAMIC
+CEXTRA=		@DEFS@
 ifeq ("$(BUILD_TYPE)","release")
 CFLAGS+=	$(CRELEASE) $(CWARN) $(CINCLUDE) $(CEXTRA) $(XFLAGS)
 LDFLAGS=	$(LDRELEASE) @LDFLAGS@
@@ -181,16 +219,19 @@ else
 CFLAGS+=	$(CDEBUG) $(CWARN) $(CINCLUDE) $(CEXTRA) $(XFLAGS)
 LDFLAGS=	$(LDDEBUG) @LDFLAGS@
 endif
-LDLIBS=		-L$(D_LIB) @LIBS@ @EXTRALIBS@
+LDLIBS=		-L$(D_LIB) @LDLIBS@ @LIBS@ @EXTRALIBS@
 
+ARFLAGS=	rcv
 RMFLAGS=	-f
 RMDFLAGS=	-rf
 
 #########################################################################################
 # Targets
 
+LW=		$(D_LIB)/$(LP)
+
 ifeq ("wcl386","$(CC)")
-ifeq ("@TOOLCHAIN@","owc20")
+ifeq ("owc20","@TOOLCHAIN@")
 CLBRNAME=	clbr20
 MT7RNAME=	mt7r20
 PLBRNAME=	plbr20
@@ -199,9 +240,18 @@ CLBRNAME=	clbr19
 MT7RNAME=	mt7r19
 PLBRNAME=	plbr19
 endif
+
+	# As path format is dependent on which variant,
+	# firstly resolve using WATCOM envvar, otherwise fallback to which.
+LIBCLBRPATH=	$(subst \,/,$(wildcard $(WATCOM)/binnt/$(CLBRNAME).dll))
+ifeq ("","$(LIBCLBRPATH)")
 LIBCLBRPATH=	$(shell which $(CLBRNAME).dll)
 LIBMT7RPATH=	$(shell which $(MT7RNAME).dll)
 LIBPLBRPATH=	$(shell which $(PLBRNAME).dll)
+else
+LIBMT7RPATH=	$(subst \,/,$(wildcard $(WATCOM)/binnt/$(MT7RNAME).dll))
+LIBPLBRPATH=	$(subst \,/,$(wildcard $(WATCOM)/binnt/$(PLBRNAME).dll))
+endif
 endif
 
 BUILDINFO=	include/buildinfo.h
@@ -231,9 +281,28 @@ endif
 .DEFAULT:
 .PHONY:			build release debug
 build:			directories buildinfo libs bins import
+.PHONY:				help
+help:
+	@$(ECHO) -e "\
+		|\n\
+		| make [release or debug] target \n\
+		|\n\
+		|	Build one or more of the following targets recursively within each sub-directory\n\
+		|	for the toolchain @TOOLCHAIN@. \n\
+		|\n\
+		| Targets: \n\
+		|\n\
+		|	build   - build everything. \n\
+		|	package - build all packages. \n\
+		|	clean   - delete everything which can be remade. \n\
+		|	help    - command line usage. \n\
+		"
 
+.PHONY:				release
 release:
 		$(MAKE) BUILD_TYPE=release $(filter-out release, $(MAKECMDGOALS))
+
+.PHONY:				debug
 debug:
 		$(MAKE) BUILD_TYPE=debug $(filter-out debug, $(MAKECMDGOALS))
 
@@ -245,6 +314,8 @@ new_release:			new_buildnumber
 BUILD_DATE=		$(shell date +'%Y%m%d')
 ifneq ($(APPVEYOR_BUILD_NUMBER),)
 BUILD_NUMBER=		$(APPVEYOR_BUILD_NUMBER)
+else ifneq ($(GITHUB_RUN_NUMBER),)
+BUILD_NUMBER=		$(GITHUB_RUN_NUMBER)
 else
 BUILD_NUMBER=		$(shell cat BUILDNUMBER)
 endif
@@ -293,7 +364,7 @@ $(LW)%$(A):		$(D_LIB)/.created $(D_OBJ)/.created
 		@echo --- bulding $@
 		$(MAKE) -C $(notdir $(basename $@))
 
-.PHONY: import
+.PHONY:		import
 import:				$(IMPORT)
 
 ifeq ("wcl386","$(CC)")
@@ -340,3 +411,5 @@ distclean:		clean
 			Makefile
 
 #end
+
+endif	# BUILD_TYPE

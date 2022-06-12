@@ -1,11 +1,11 @@
 #include <edidentifier.h>
-__CIDENT_RCSID(gr_w32_setrlimit_c,"$Id: w32_setrlimit.c,v 1.3 2020/07/02 16:25:19 cvsuser Exp $")
+__CIDENT_RCSID(gr_w32_setrlimit_c,"$Id: w32_setrlimit.c,v 1.4 2022/06/12 16:08:44 cvsuser Exp $")
 
 /* -*- mode: c; indent-width: 4; -*- */
 /*
  * win32 setrlimit() system calls
  *
- * Copyright (c) 2020, Adam Young.
+ * Copyright (c) 2020 - 2022, Adam Young.
  * All rights reserved.
  *
  * This file is part of memcached-win32.
@@ -42,7 +42,6 @@ __CIDENT_RCSID(gr_w32_setrlimit_c,"$Id: w32_setrlimit.c,v 1.3 2020/07/02 16:25:1
 #include <stdio.h>
 #include <unistd.h>
 
-
 int
 setrlimit(int resource, const struct rlimit *rlp)
 {
@@ -55,7 +54,11 @@ setrlimit(int resource, const struct rlimit *rlp)
         case RLIMIT_NOFILE: {
                 int newmax, ret = 0;
                 if (rlp->rlim_max > WIN32_FILDES_DEF) {
+#if defined(__WATCOMC__)
+                    if (_grow_handles(rlp->rlim_max) < rlp->rlim_max) {
+#else
                     if (-1 == (newmax = _setmaxstdio(rlp->rlim_max))) {
+#endif
                         errno = EINVAL;
                         ret = -1;
                     }

@@ -1,14 +1,13 @@
 #ifndef LIBW32_GETOPT_H_INCLUDED
 #define LIBW32_GETOPT_H_INCLUDED
 #include <edidentifier.h>
-__CIDENT_RCSID(gr_libw32_getopt_h,"$Id: getopt.h,v 1.3 2020/07/02 16:25:17 cvsuser Exp $")
+__CIDENT_RCSID(gr_libw32_getopt_h,"$Id: getopt.h,v 1.4 2022/06/12 16:08:42 cvsuser Exp $")
 __CPRAGMA_ONCE
-
 /* -*- mode: c; indent-width: 4; -*- */
 /*
  * win <getopt.h>
  *
- * Copyright (c) 1998 - 2020, Adam Young.
+ * Copyright (c) 1998 - 2022, Adam Young.
  * All rights reserved.
  *
  * This file is part of memcached-win32.
@@ -36,11 +35,11 @@ __CPRAGMA_ONCE
 
 __BEGIN_DECLS
 
-LIBW32_API extern int   opterr;                 /* if error message should be printed */
-LIBW32_API extern int   optind;                 /* index into parent argv vector */
-LIBW32_API extern int   optopt;                 /* character checked for validity */
-LIBW32_API extern int   optreset;               /* reset getopt */
-LIBW32_API extern char *optarg;
+LIBW32_VAR int          opterr;                 /* if error message should be printed */
+LIBW32_VAR int          optind;                 /* index into parent argv vector */
+LIBW32_VAR int          optopt;                 /* character checked for validity */
+LIBW32_VAR int          optreset;               /* reset getopt */
+LIBW32_VAR char         *optarg;
 
 /*
  *  GNU like getopt_long() and BSD4.4 getsubopt()/optreset extensions.

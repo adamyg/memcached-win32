@@ -1,9 +1,9 @@
 #!/usr/bin/perl
-# $Id: makelib.in,v 1.2 2020/07/03 20:32:10 cvsuser Exp $
+# $Id: makelib.in,v 1.3 2022/06/12 16:11:01 cvsuser Exp $
 # -*- mode: perl; tabs: 8; indent-width: 4; -*-
 # makelib configuration
 #
-# Copyright (c) 2020, Adam Young.
+# Copyright (c) 2020 - 2022, Adam Young.
 # All rights reserved.
 #
 # The applications are free software: you can redistribute it
@@ -32,7 +32,7 @@
 
 $PACKAGE        = 'memcached-win32';
 $PACKAGE_NAME   = 'Windows Memcached Service';
-$PACKAGE_VERSION = '0.0.1';
+$PACKAGE_VERSION = '1.6.6';
 
 $PACKAGE_URL    = 'https://github.com/adamyg/memcached_win32';
 
@@ -52,6 +52,7 @@ $PACKAGE_FILE   = 'package.h';
 @LIBRARIES2     = (    # local libraries -l<xxx> xxx.lib
         );
 
+@TESTLIBRARIES  = ();  # library test
 @OPTLIBRARIES   = ();  # optional libraries
 
 ## Makefiles
@@ -64,16 +65,62 @@ $PACKAGE_FILE   = 'package.h';
         'libevent',
         'libmemcached',
         'libNTService',
-        'service',
+        'service'
         );
 
 ## Toolchain
 
 sub
+ResolveWINKITx86()
+{
+        my $ProgramFiles = $ENV{"ProgramFiles(x86)"};
+        $ProgramFiles =~ s/\\/\//g;
+
+        my @WINKIT = (                                  # Vista+
+                # https://en.wikipedia.org/wiki/Microsoft_Windows_SDK
+                "${ProgramFiles}/Windows Kits/8.0/Lib/win8/um/x86",
+                "${ProgramFiles}/Windows Kits/8.1/Lib/winv6.3/um/x86",
+                "${ProgramFiles}/Windows Kits/10",
+                "${ProgramFiles}/Windows Kits/11"
+                );
+
+        my @sdks;
+        foreach (@WINKIT) {
+                my $sdk = $_;
+                next if (! -d $sdk);
+
+                if (/\/1[01]$/) {                       # "Lib/10.0.xxxxx.0/um/x86"
+                    my @winsdk10 = glob("'${sdk}/Lib/*/um/x86'");
+                    foreach (@winsdk10) {
+                        next if (! -f "$_/Kernel32.lib");
+                        push @sdks, $_;
+                    }
+
+                } else {
+                    next if (! -f "${sdk}/Kernel32.lib");
+                    push @sdks, $sdk;
+                }
+        }
+
+        die "cannot locate any suitable winsdks\n"
+                if (! scalar @sdks);
+
+        foreach (@sdks) {
+                print "WINKIT:   $_\n";
+        }
+
+        set_winsdk($sdks[0]);
+}
+
+
+sub
 Configure()
 {
-        # Visual studio
         ################################################################################
+        # Common
+
+        ################################################################################
+        # Visual studio
 
         if ($TOOLCHAIN =~ /^vs/) {
 
@@ -82,9 +129,6 @@ Configure()
                 remove_define('WIN32');
                 add_define('HAVE_CONFIG_H');
                 add_define('_WIN32_WINNT=0x600');       # Windows SDK
-
-                add_define('LIBW32_DYNAMIC');           # libw32 bindings
-                add_define('LIBW32_SOCKET_MAP_NATIVE');
 
                 add_xinclude('$(ROOT)/libw32');         # Extra includes; C and compiler tests.
                 add_xinclude('$(ROOT)/libw32/msvc');    # MSVC specials
@@ -99,9 +143,6 @@ Configure()
                 remove_define('WIN32');
                 add_define('HAVE_CONFIG_H');
                 add_define('_WIN32_WINNT=0x600');       # Windows SDK
-
-                add_define('LIBW32_DYNAMIC');           # libw32 bindings
-                add_define('LIBW32_SOCKET_MAP_NATIVE');
 
                 add_xinclude('$(ROOT)/libw32');         # Extra includes; C and compiler tests.
                 add_application_library('libw32.lib');

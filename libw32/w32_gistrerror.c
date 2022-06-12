@@ -1,11 +1,11 @@
 #include <edidentifier.h>
-__CIDENT_RCSID(gr_w32_gistrerror_c,"$Id: w32_gistrerror.c,v 1.3 2020/07/02 16:25:18 cvsuser Exp $")
+__CIDENT_RCSID(gr_w32_gistrerror_c,"$Id: w32_gistrerror.c,v 1.4 2022/06/12 16:08:44 cvsuser Exp $")
 
 /* -*- mode: c; indent-width: 4; -*- */
 /*
  * win32 gi_strerror()
  *
- * Copyright (c) 1998 - 2020, Adam Young.
+ * Copyright (c) 1998 - 2022, Adam Young.
  * All rights reserved.
  *
  * This file is part of memcached-win32.
@@ -80,7 +80,7 @@ __CIDENT_RCSID(gr_w32_gistrerror_c,"$Id: w32_gistrerror.c,v 1.3 2020/07/02 16:25
 
 #if (defined(_MSC_VER) && (_MSC_VER < 1400)) || \
 	defined(__WATCOMC__)
-LIBW32_API const char * 
+LIBW32_API const char *
 gai_strerror(int ecode)
 {
     return w32_gai_strerror(ecode);

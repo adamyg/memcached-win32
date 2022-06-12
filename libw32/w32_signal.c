@@ -1,11 +1,11 @@
 #include <edidentifier.h>
-__CIDENT_RCSID(gr_w32_signal_c,"$Id: w32_signal.c,v 1.3 2020/07/02 16:25:19 cvsuser Exp $")
+__CIDENT_RCSID(gr_w32_signal_c,"$Id: w32_signal.c,v 1.4 2022/06/12 16:08:44 cvsuser Exp $")
 
 /* -*- mode: c; indent-width: 4; -*- */
 /*
  * win32 signal support
  *
- * Copyright (c) 1998 - 2020, Adam Young.
+ * Copyright (c) 1998 - 2022, Adam Young.
  * All rights reserved.
  *
  * This file is part of memcached-win32.
@@ -40,22 +40,22 @@ __CIDENT_RCSID(gr_w32_signal_c,"$Id: w32_signal.c,v 1.3 2020/07/02 16:25:19 cvsu
 #include <unistd.h>
 #include <signal.h>
 
-#if !defined(__MINGW32__)
+#if !defined(__MINGW64__)
 /*
 //  NAME
 //      sigemptyset - initialize and empty a signal set
-//  
+//
 //  SYNOPSIS
 //      #include <signal.h>
-//  
+//
 //      int sigemptyset(sigset_t *set); [Option End]
-//  
+//
 //  DESCRIPTION
 //      The sigemptyset() function initializes the signal set pointed to by set, such that all signals defined in POSIX.1-2017 are excluded.
-//  
+//
 //  RETURN VALUE
 //      Upon successful completion, sigemptyset() shall return 0; otherwise, it shall return -1 and set errno to indicate the error.
-//  
+//
 //  ERRORS
 //      No errors are defined.
 //

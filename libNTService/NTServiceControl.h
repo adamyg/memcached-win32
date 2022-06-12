@@ -1,8 +1,9 @@
+/* -*- mode: c; indent-width: 8; -*- */
 /*
  * CNTService - Classic window services framework (tweaked).
  * Service Control
  *
- * Copyright (c) 2020, Adam Young.
+ * Copyright (c) 2020 - 2022, Adam Young.
  * All rights reserved.
  *
  * This file is part of memcached-win32.
@@ -26,26 +27,25 @@
  * ==end==
  */
 
-#include <string>
-
 #include "NTServiceIO.h"
+#include "NTString.h"
 
 class CNTServiceControl {
-    CNTServiceControl(const class CNTServiceControl &) /*=delete*/;
-    CNTServiceControl& operator=(const CNTServiceControl &) /*=delete*/;
+        CNTServiceControl(const class CNTServiceControl &) /*=delete*/;
+        CNTServiceControl& operator=(const CNTServiceControl &) /*=delete*/;
 
 public:
-    CNTServiceControl(const char *svcname, NTService::IDiagnostics &diags = NTService::StdioDiagnosticsIO::Get());
-    ~ CNTServiceControl();
+        CNTServiceControl(const char *svcname, NTService::IDiagnostics &diags = NTService::StdioDiagnosticsIO::Get());
+        ~ CNTServiceControl();
 
-    int  ExecuteCommand(int argc, const char * const *argv, unsigned filter = 0);
-    void Start();
-    void UpdateDacl();
-    void Stop();
+        int  ExecuteCommand(int argc, const char * const *argv, unsigned filter = 0);
+        void Start();
+        void UpdateDacl();
+        void Stop();
 
 private:
-    NTService::IDiagnostics &diags_;
-    std::string svcName_;
+        NTService::IDiagnostics &diags_;
+        NTService::CString svcName_;
 };
 
 //end

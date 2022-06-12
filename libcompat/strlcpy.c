@@ -56,7 +56,7 @@ strlcpy(char *dst, const char *src, size_t siz)
 extern void __stdlibrary_has_strlcpy(void);
 
 void
- __stdlibrary_has_strlcpy(void)
+__stdlibrary_has_strlcpy(void)
 {
 }
 

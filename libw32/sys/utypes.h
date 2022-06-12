@@ -1,14 +1,14 @@
 #ifndef LIBW32_SYS_UTYPES_H_INCLUDED
 #define LIBW32_SYS_UTYPES_H_INCLUDED
 #include <edidentifier.h>
-__CIDENT_RCSID(gr_libw32_sys_utypes_h,"$Id: utypes.h,v 1.3 2020/07/02 16:25:21 cvsuser Exp $")
+__CIDENT_RCSID(gr_libw32_sys_utypes_h,"$Id: utypes.h,v 1.4 2022/06/12 16:08:46 cvsuser Exp $")
 __CPRAGMA_ONCE
 
 /* -*- mode: c; indent-width: 4; -*- */
-/*
+/* 
  * win32 unix types
  *
- * Copyright (c) 1998 - 2020, Adam Young.
+ * Copyright (c) 1998 - 2022, Adam Young.
  * All rights reserved.
  *
  * This file is part of memcached-win32.
@@ -33,23 +33,6 @@ __CPRAGMA_ONCE
  */
 
 #if defined(_MSC_VER)
-#if (_MSC_VER != 1200)                          /* MSVC 6 */
-#if (_MSC_VER != 1400)                          /* MSVC 8/2005 */
-#if (_MSC_VER != 1500)                          /* MSVC 9/2008 */
-#if (_MSC_VER != 1600)                          /* MSVC 10/2010 */
-#if (_MSC_VER != 1900)                          /* MSVC 19/2015 */
-#if (_MSC_VER <  1910 || _MSC_VER > 1916)       /* MSVC 19.10 .. 16/2017 */
-#if (_MSC_VER > 1926)                           /* MSVC 19.20 /2019 */
-#error utypes.h: untested MSVC Version (2005 -- 2019.06) only ...
- //see: https://en.wikipedia.org/wiki/Microsoft_Visual_C%2B%2B
-#endif //2019
-#endif //2017
-#endif //2015
-#endif //2010
-#endif //2008
-#endif //2005
-#endif //_MSC_VER
-
 #pragma warning(disable:4115)
 
 #elif defined(__WATCOMC__)
@@ -137,28 +120,31 @@ typedef unsigned long fixpt_t;                  /* fixed point number */
 
 /* system identifiers */
 #if !defined(HAVE_PID_T)
-#if !defined(__WATCOMC__) || \
-        (defined(__WATCOMC__) && (__WATCOMC__ < 1300 /*owc20*/))
+#if defined(_MSC_VER) || \
+        (defined(__WATCOMC__) && (__WATCOMC__ < 1300 /*owc20*/)) || \
+        (defined(__MINGW32__) && !defined(__MINGW64_VERSION_MAJOR))
 typedef int pid_t;                              /* process identifier */
 #endif
-#define HAVE_PID_T
+#define HAVE_PID_T 1
 #endif
 
-#if !defined(HAVE_SSIZE_T)
+#if !defined(__MINGW32__) || \
+        (defined(__MINGW32__) && !defined(__MINGW64_VERSION_MAJOR))
+
+#if !defined(USECONDS_T)
+#define USECONDS_T 1
 #ifdef _WIN64
-#define ssize_t long long
+typedef unsigned long long useconds_t;
 #else
-#define ssize_t long
+typedef unsigned long useconds_t;
 #endif
-#define HAVE_SSIZE_T
-#endif
+#endif /*USECONDS_T*/
+#endif /*__MINHW32__*/
 
 #ifdef _WIN64
-typedef long long suseconds_t;                  /* sys/types.h */
-typedef unsigned useconds_t;
+typedef long long suseconds_t;
 #else
-typedef long suseconds_t;                       /* sys/types.h */
-typedef unsigned useconds_t;
+typedef long suseconds_t;
 #endif
 
 #if defined(_MSC_VER) && \
@@ -171,10 +157,17 @@ typedef int gid_t;
 #if !defined(id_t)
 typedef int id_t;                               /* used as a general identifier; can contain least a pid_t, uid_t, or gid_t. */
 #endif
-#if !defined(ssize_t)
-typedef int ssize_t;
-#define ssize_t ssize_t                         /* see libssh */
+
+#if !defined(ssize_t) && !defined(_SSIZE_T_DEFINED)
+#define _SSIZE_T_DEFINED_ 1
+#ifdef _WIN64
+typedef __int64 ssize_t;
+#else
+typedef signed ssize_t;
 #endif
+#define ssize_t ssize_t
+#endif
+
 #if !defined(mode_t)
 typedef unsigned short mode_t;
 #define mode_t mode_t
@@ -185,7 +178,11 @@ typedef unsigned short mode_t;
 typedef int uid_t;
 typedef int gid_t;
 #endif
+#if !defined(id_t)
+typedef int id_t;                               /* used as a general identifier; can contain least a pid_t, uid_t, or gid_t. */
 #endif
+
+#endif /*_MSC_VER || __MINGW32__*/
 
 #if !defined(HAVE_NLINK_T)
 #if !defined(__WATCOMC__) || \
@@ -207,3 +204,4 @@ typedef unsigned nlink_t;                       /* link count */
 #endif
 
 #endif /*LIBW32_SYS_UTYPES_H_INCLUDED*/
+

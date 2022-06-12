@@ -5,7 +5,7 @@
 /*
  * Service adapter
  *
- * Copyright (c) 2020, Adam Young.
+ * Copyright (c) 2020 - 2022, Adam Young.
  * All rights reserved.
  *
  * The applications are free software: you can redistribute it
@@ -27,9 +27,11 @@
  * ==end==
  */
 
-#if defined(_MSC_VER)
-#include <msvc_system_error.hpp>
+#if defined(__WATCOMC__)
+#undef min
+#undef max
 #endif
+
 #include "../libNTService/NTService.h"
 
 #include "Config.h"
@@ -43,10 +45,21 @@ class Service : public CNTService {
 
 public:
         struct Options {
-                Options() : argc(0), argv(NULL), arg0(NULL), port(0),
-                        ignore(false), daemon_mode(false), delay_start(false),
-                        console_output(false), logger(true) {
+                Options() : service_main(NULL), service_shutdown(NULL),
+                        argc(0), argv(NULL), arg0(NULL),
+                        ignore(false),
+                        daemon_mode(false),
+                        delay_start(false),
+                        console_output(false),
+                        logger(true),
+                        conf_required(false),
+                        port(0)
+                {
                 }
+
+                int (__cdecl *service_main)(int argc, const char **);
+                void (__cdecl *service_shutdown)(int ret);
+
                 int argc;
                 const char **argv;
                 const char *arg0;
@@ -55,15 +68,16 @@ public:
                 bool delay_start;
                 bool console_output;
                 bool logger;
+                bool conf_required;
                 unsigned port;
                 std::string conf;
         };
 
 public:
-        Service(const char *svcname, bool console_mode = true);
+        Service(const char *appname, const char *svcname, bool console_mode = true);
         virtual ~Service();
 
-        void Start(const struct Options &options);
+        void Start(const Options &options);
 
 protected:
         static  std::string ResolveRelative(const char *path);
@@ -73,6 +87,7 @@ protected:
         virtual bool ConfigSet(const char *csKey, DWORD dwValue);
         virtual int  ConfigGet(const char *csKey, char *szBuffer, size_t dwSize, unsigned flags = 0);
         virtual bool ConfigGet(const char *csKey, DWORD &dwValue, unsigned flags = 0);
+                int  ConfigGet(const char *csKey, std::string &value, unsigned flags = 0);
 
 protected:
         int Initialise();
@@ -97,16 +112,17 @@ private:
 private:
         struct Options options_;
         Config config_;
+        bool configopen_;
         Logger logger_;
 
-        char   pipe_name_[256];
+        char appname_[64];
+        char pipe_name_[256];
         HANDLE logger_stop_event_;
         HANDLE logger_thread_;
         HANDLE server_stopped_event_;
         HANDLE server_thread_;
 };
 
-#endif  //SERVICE_H_INCLUDED
+#endif //SERVICE_H_INCLUDED
 
 //end
-

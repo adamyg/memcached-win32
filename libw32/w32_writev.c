@@ -1,11 +1,11 @@
 #include <edidentifier.h>
-__CIDENT_RCSID(gr_w32_writev_c,"$Id: w32_writev.c,v 1.3 2020/07/02 16:25:19 cvsuser Exp $")
+__CIDENT_RCSID(gr_w32_writev_c,"$Id: w32_writev.c,v 1.4 2022/06/12 16:08:45 cvsuser Exp $")
 
 /* -*- mode: c; indent-width: 4; -*- */
 /*
  * win32 writev() system calls,
  *
- * Copyright (c) 2018 - 2020, Adam Young.
+ * Copyright (c) 2018 - 2022, Adam Young.
  * All rights reserved.
  *
  * This file is part of memcached-win32.
@@ -48,8 +48,8 @@ __CIDENT_RCSID(gr_w32_writev_c,"$Id: w32_writev.c,v 1.3 2020/07/02 16:25:19 cvsu
 
 #pragma comment(lib, "Ws2_32.lib")
 
- 
-LIBW32_API int /*ssize_t*/ 
+
+LIBW32_API int /*ssize_t*/
 writev(int fildes, const struct iovec *iov, int iovcnt)
 {
     SOCKET s = (SOCKET)-1;
@@ -64,6 +64,7 @@ writev(int fildes, const struct iovec *iov, int iovcnt)
     } else if (w32_issockfd(fildes, &s)) {
         ret = 0;
         for (i = 0; i < iovcnt; ++i) {
+#undef sendto
             const int cnt = sendto(s, iov[i].iov_base, iov[i].iov_len, 0, NULL, 0);
             if (cnt > 0) {
                 ret += cnt;

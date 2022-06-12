@@ -1,7 +1,8 @@
+/* -*- mode: c; indent-width: 8; -*- */
 /*
  * Simple config
  *
- * Copyright (c) 2020, Adam Young.
+ * Copyright (c) 2020 - 2022, Adam Young.
  * All rights reserved.
  *
  * The applications are free software: you can redistribute it
@@ -23,11 +24,37 @@
  * ==end==
  */
 
+#if !defined(_CRT_SECURE_NO_WARNINGS)
+#define _CRT_SECURE_NO_WARNINGS
+#endif
+
 #include <iostream>
 #include <fstream>
 #include <assert.h>
 
 #include "Config.h"
+
+#if defined(__WATCOMC__) && (__WATCOMC__ <= 1300)
+#include <istream>
+namespace std {
+        inline std::istream&
+        getline(std::istream& input, std::string& str, char delim = '\n') {
+            std::string t_str;
+            char c;
+
+            str.clear();
+            t_str.reserve(str.capacity() > 1024 ? str.capacity(): 1024);
+            if (input.get(c)) {
+                t_str.push_back(c);
+                while (input.get(c) && c != delim)
+                    t_str.push_back(c);
+                if (!input.bad())
+                    str = t_str;
+            }
+            return input;
+        }
+}
+#endif  //__WATCOMC__
 
 namespace {
         // left trim
@@ -66,19 +93,17 @@ Config::~Config()
 bool
 Config::Load(const std::string &file, std::string &errmsg)
 {
-        std::ifstream input(file);
-        if (! input) return false;
+        std::ifstream input(file.c_str());
+        if (! input) {
+                errmsg = strerror(errno);
+                return false;
+        }
 
         try {
                 values_t *values = FetchSection("");
 
                 for (std::string line; std::getline(input, line); ) {
-
-                        // line
-                        //      line.erase(std::remove_if(line.begin(), line.end(), isspace),line.end());
-                        //      if (line[0] == '#' || line.empty()) {
-                        //              continue;
-                        //      }
+                        // comment/blank lines
                         const size_t bang = line.find_first_of("#");
                         if (bang != std::string::npos) {
                                 line.erase(bang);
@@ -116,7 +141,6 @@ Config::Load(const std::string &file, std::string &errmsg)
                         }
                 }
                 input.close();
-                return true;
 
         } catch (std::runtime_error &e) {
                 errmsg = e.what();
@@ -168,6 +192,20 @@ Config::HasSection(const std::string &section) const
 
 
 bool
+Config::HasSection(const Config::string_view &section) const
+{
+        return sections_.find(section) != sections_.end() ? true : false;
+}
+
+
+bool
+Config::HasSection(const char *section) const
+{
+        return (section && sections_.find(section) != sections_.end() ? true : false);
+}
+
+
+bool
 Config::GetSections(std::vector<std::string> &sections) const
 {
         for (sections_t::const_iterator it(sections_.begin()), end(sections_.end()); it != end; ++it) {
@@ -207,9 +245,44 @@ Config::GetKeys(const std::string &section, std::vector<std::string> &keys) cons
 }
 
 
-const std::string
+bool
+Config::GetKeys(const Config::string_view &section, std::vector <std::string> &keys) const
+{
+        sections_t::const_iterator it(sections_.find(section));
+        if (it != sections_.end()) {
+                if (const values_t *values = it->second) {
+                        const collection_t &collection = values->collection;
+                        for (collection_t::const_iterator vit(collection.begin()), vend(collection.end()); vit != vend; ++vend) {
+                                keys.push_back(vit->first);
+                        }
+                        return true;
+                }
+        }
+        return false;
+}
+
+
+bool
+Config::GetKeys(const char *section, std::vector<std::string> &keys) const
+{
+        sections_t::const_iterator it(sections_.find(section?section:""));
+        if (it != sections_.end()) {
+                if (const values_t *values = it->second) {
+                        const collection_t &collection = values->collection;
+                        for (collection_t::const_iterator vit(collection.begin()), vend(collection.end()); vit != vend; ++vend) {
+                                keys.push_back(vit->first);
+                        }
+                        return true;
+                }
+        }
+        return false;
+}
+
+
+const std::string &
 Config::GetValue(const std::string &section, const std::string &key) const
 {
+        static const std::string null;
         sections_t::const_iterator it(sections_.find(section));
         if (it != sections_.end()) {
                 if (const values_t *values = it->second) {
@@ -220,11 +293,29 @@ Config::GetValue(const std::string &section, const std::string &key) const
                         }
                 }
         }
-        return std::string();
+        return null;
 }
 
 
-const std::string
+const std::string &
+Config::GetValue(const Config::string_view &section, const Config::string_view &key) const
+{
+        static const std::string null;
+        sections_t::const_iterator it(sections_.find(section));
+        if (it != sections_.end()) {
+                if (const values_t *values = it->second) {
+                        const collection_t &collection = values->collection;
+                        collection_t::const_iterator cit(collection.find(key));
+                        if (cit != collection.end()) {
+                                return cit->second;
+                        }
+                }
+        }
+        return null;
+}
+
+
+const std::string &
 Config::GetValue(const std::string &section, const std::string &key, const std::string &def) const
 {
         sections_t::const_iterator it(sections_.find(section));
@@ -244,6 +335,25 @@ Config::GetValue(const std::string &section, const std::string &key, const std::
 const std::string *
 Config::GetValuePtr(const std::string &section, const std::string &key, const std::string *def) const
 {
+        if (! key.empty()) {
+                sections_t::const_iterator it(sections_.find(section));
+                if (it != sections_.end()) {
+                        if (const values_t *values = it->second) {
+                                const collection_t &collection = values->collection;
+                                collection_t::const_iterator cit(collection.find(key));
+                                if (cit != collection.end()) {
+                                        return &cit->second;
+                                }
+                        }
+                }
+        }
+        return def;
+}
+
+
+const std::string *
+Config::GetValuePtr(const Config::string_view &section, const Config::string_view &key, const std::string *def) const
+{
         sections_t::const_iterator it(sections_.find(section));
         if (it != sections_.end()) {
                 if (const values_t *values = it->second) {
@@ -251,6 +361,25 @@ Config::GetValuePtr(const std::string &section, const std::string &key, const st
                         collection_t::const_iterator cit(collection.find(key));
                         if (cit != collection.end()) {
                                 return &cit->second;
+                        }
+                }
+        }
+        return def;
+}
+
+
+const std::string *
+Config::GetValuePtr(const char *section, const char *key, const std::string *def) const
+{
+        if (key && *key) {
+                sections_t::const_iterator it(sections_.find(section?section:""));
+                if (it != sections_.end()) {
+                        if (const values_t *values = it->second) {
+                                const collection_t &collection = values->collection;
+                                collection_t::const_iterator cit(collection.find(key));
+                                if (cit != collection.end()) {
+                                        return &cit->second;
+                                }
                         }
                 }
         }

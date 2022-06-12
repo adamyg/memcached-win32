@@ -1,11 +1,11 @@
 #include <edidentifier.h>
-__CIDENT_RCSID(gr_w32_socket2_c,"$Id: w32_socket2.c,v 1.3 2020/07/02 16:25:19 cvsuser Exp $")
+__CIDENT_RCSID(gr_w32_socket2_c,"$Id: w32_socket2.c,v 1.4 2022/06/12 16:08:44 cvsuser Exp $")
 
 /*
  * win32 socket () system calls
  * Light weight replacement functions, which maintain the global errno.
  *
- * Copyright (c) 2007, 2012 - 2020 Adam Young.
+ * Copyright (c) 2007, 2012 - 2022 Adam Young.
  *
  * This file is part of memcached-win32.
  *
@@ -56,6 +56,10 @@ __CIDENT_RCSID(gr_w32_socket2_c,"$Id: w32_socket2.c,v 1.3 2020/07/02 16:25:19 cv
 #include <memory.h>
 #include <assert.h>
 
+#if defined(__WATCOMC__)
+#pragma disable_message(124)                    /* Comparison result always 0 */
+#endif
+
 
 /*
  *  determine whether a valid socket file descriptor.
@@ -65,6 +69,7 @@ nativehandle(int fd)
 {
     if (fd >= 0)
         return (SOCKET)fd;
+    errno = EBADF;                              /* sockfd is not a valid open file descriptor */
     return INVALID_SOCKET;
 }
 
@@ -75,7 +80,7 @@ nativehandle(int fd)
 LIBW32_API int
 w32_socket_native(int af, int type, int protocol)
 {
-    int done = 0, ret;
+    int done = 0;
     SOCKET s;
 
 #undef socket
@@ -87,7 +92,6 @@ retry:;
             }
         }
         w32_sockerror();
-        ret = -1;
     } else {
         SetHandleInformation((HANDLE)s, HANDLE_FLAG_INHERIT, 0);
         assert((int)s < 0x7fffffff);
@@ -189,7 +193,7 @@ w32_listen_native(int fd, int num)
 #undef listen
     if ((osf = nativehandle(fd)) == (SOCKET)INVALID_SOCKET) {
         ret = -1;
-    } else if (listen((SOCKET)osf, num) != 0) {
+    } else if (listen((SOCKET)osf, (-1 == num ? SOMAXCONN : num)) != 0) {
         w32_sockerror();
         ret = -1;
     }
@@ -340,7 +344,7 @@ w32_sendmsg_native(int fd, const struct msghdr *message, int flags)
     int ret = -1;
 
     if (NULL == message || NULL == message->msg_iov ||
-            message->msg_iovlen < 0 || message->msg_iovlen > IOV_MAX) {
+            /*message->msg_iovlen < 0 ||*/ message->msg_iovlen > IOV_MAX) {
         errno = EINVAL;                         /* invalid argument */
 
     } else if (0 == message->msg_iovlen) {
@@ -421,15 +425,14 @@ w32_recvfrom_native(int fd, char *buf, int len, int flags,
 }
 
 
-
 /*
- *  sockblockingmode
+ *  socknonblockingio
  */
-LIBW32_API int         
-w32_sockblockingmode_native(int fd, int enabled)
+LIBW32_API int
+w32_socknonblockingio_native(int fd, int enabled)
 {
     SOCKET osf;
-    int ret;
+    int ret = 0;
 
     if ((osf = nativehandle(fd)) == (SOCKET)INVALID_SOCKET) {
         ret = -1;
@@ -437,6 +440,27 @@ w32_sockblockingmode_native(int fd, int enabled)
         u_long mode = (long)enabled;
         if ((ret = ioctlsocket(osf, FIONBIO, &mode)) == -1 /*SOCKET_ERROR*/) {
             w32_sockerror();
+        }
+    }
+    return ret;
+}
+
+
+/*
+ *  sockinheritable
+ */
+LIBW32_API int
+w32_sockinheritable_native(int fd, int enabled)
+{
+    SOCKET osf;
+    int ret = 0;
+
+    if ((osf = nativehandle(fd)) == (SOCKET)INVALID_SOCKET) {
+        ret = -1;
+    } else {
+        if (! SetHandleInformation((HANDLE)osf, HANDLE_FLAG_INHERIT, enabled ? 1 : 0)) {
+            w32_sockerror();
+            ret = -1;
         }
     }
     return ret;
@@ -522,4 +546,3 @@ w32_shutdown_native(int fd, int how)
 }
 
 /*end*/
-

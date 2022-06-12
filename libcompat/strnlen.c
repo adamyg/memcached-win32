@@ -36,7 +36,7 @@ strnlen(const char *str, size_t maxlen)
 extern void __stdlibrary_has_strnlen(void);
 
 void
- __stdlibrary_has_strnlen(void)
+__stdlibrary_has_strnlen(void)
 {
 }
 

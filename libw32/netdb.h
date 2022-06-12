@@ -1,14 +1,14 @@
 #ifndef LIBW32_NETDB_H_INCLUDED
 #define LIBW32_NETDB_H_INCLUDED
 #include <edidentifier.h>
-__CIDENT_RCSID(gr_libw32_netdb_h,"$Id: netdb.h,v 1.3 2020/07/02 16:25:17 cvsuser Exp $")
+__CIDENT_RCSID(gr_libw32_netdb_h,"$Id: netdb.h,v 1.4 2022/06/12 16:08:43 cvsuser Exp $")
 __CPRAGMA_ONCE
 
 /* -*- mode: c; indent-width: 4; -*- */
 /*
  * win32 <netdb.h> implementation
  *
- * Copyright (c) 1998 - 2020, Adam Young.
+ * Copyright (c) 1998 - 2022, Adam Young.
  * All rights reserved.
  *
  * This file is part of memcached-win32.

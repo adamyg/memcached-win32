@@ -89,7 +89,7 @@ cont:
 extern void __stdlibrary_has_strtok_r(void);
 
 void
- __stdlibrary_has_strtok_r(void)
+__stdlibrary_has_strtok_r(void)
 {
 }
 
