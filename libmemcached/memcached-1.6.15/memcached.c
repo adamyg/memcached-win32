@@ -4746,7 +4746,7 @@ void memcached_signal_stop (int verbose) {
 
 #if defined(WIN32PORT)
 #define exit(__x) return __x
-int memcached_main (int argc, char **argv) {
+int memcached_main (int argc, const char * const *argv) {
 #else
 int main (int argc, char **argv) {
 #endif
@@ -5015,8 +5015,7 @@ int main (int argc, char **argv) {
         {0, 0, 0, 0}
     };
     int optindex;
-    while (-1 != (c = getopt_long(argc, argv, shortopts,
-                    longopts, &optindex))) {
+    while (-1 != (c = getopt_long(argc, (char * const *)argv, shortopts, longopts, &optindex))) {
 #else
     while (-1 != (c = getopt(argc, argv, shortopts))) {
 #endif

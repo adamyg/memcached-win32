@@ -63,6 +63,12 @@ D_LIB=		$(ROOT)/lib@TOOLCHAINEXT@/$(BUILD_TYPE)
 XFLAGS=
 CFLAGS=		@CFLAGS@
 CWARN=		@CWARN@
+ifeq (gcc,$(findstring gcc,$(CC)))
+CWARN+=		-Wno-old-style-declaration
+CWARN+=		-Wno-unused-variable -Wno-unused-parameter -Wno-unused-but-set-parameter -Wno-shadow
+CWARN+= 	-Wno-implicit-fallthrough -Wno-empty-body
+CWARN+=		-Wno-sign-compare
+endif
 CDEBUG=		@CDEBUG@
 CRELEASE=	@CRELEASE@
 LDDEBUG=	@LDDEBUG@

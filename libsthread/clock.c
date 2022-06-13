@@ -140,24 +140,9 @@ clock_gettime(int clockid, struct timespec *time_spec)
 }
 #endif  /*__MINGW32__*/
 
-
-#if !defined(HAVE_PTHREAD_H)
-int
-usleep(useconds_t useconds)
-{
-    if (useconds >= 1000000) return EINVAL;
-    Sleep((DWORD)(useconds / 1000));
-    return 0;
-}
-
-
-//libcompat
-//unsigned
-//sleep(unsigned secs)
-//{
-//   Sleep((DWORD)secs * 1000);
-//   return 0;
-//}
-#endif
+/*libw32/unistd
+ *  unsigned sleep(unsigned seconds);
+ *  int usleep(useconds_t useconds);
+ */
 
 /*end*/
