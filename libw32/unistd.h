@@ -1,7 +1,7 @@
 #ifndef LIBW32_UNISTD_H_INCLUDED
 #define LIBW32_UNISTD_H_INCLUDED
 #include <edidentifier.h>
-__CIDENT_RCSID(gr_libw32_unistd_h,"$Id: unistd.h,v 1.5 2022/06/13 05:34:01 cvsuser Exp $")
+__CIDENT_RCSID(gr_libw32_unistd_h,"$Id: unistd.h,v 1.6 2022/06/13 05:56:41 cvsuser Exp $")
 __CPRAGMA_ONCE
 
 /* -*- mode: c; indent-width: 4; -*- */
@@ -410,7 +410,7 @@ __BEGIN_DECLS
 #define SIGWINCH        -102
 #define SIGPIPE         -103
 
-#if !defined(__MINGW64_)
+#if !defined(__MINGW32__)
 typedef struct {
     unsigned            junk;
 } sigset_t;
@@ -429,7 +429,7 @@ struct sigaction {
 
 LIBW32_API int          sigemptyset (sigset_t *);
 LIBW32_API int          sigaction (int, struct sigaction *, struct sigaction *);
-#endif /*__MINGW64__*/
+#endif /*__MINGW32__*/
 
 /*shell support*/
 #if !defined(WNOHANG)

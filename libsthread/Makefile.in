@@ -1,5 +1,5 @@
 # -*- mode: mak; indent-tabs-mode: t; tab-width: 8 -*-
-# libcompat makefile.
+# libsthread makefile.
 #
 #
 # Copyright (c) 2020 - 2022, Adam Young.

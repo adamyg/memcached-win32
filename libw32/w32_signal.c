@@ -1,5 +1,5 @@
 #include <edidentifier.h>
-__CIDENT_RCSID(gr_w32_signal_c,"$Id: w32_signal.c,v 1.4 2022/06/12 16:08:44 cvsuser Exp $")
+__CIDENT_RCSID(gr_w32_signal_c,"$Id: w32_signal.c,v 1.5 2022/06/13 05:58:08 cvsuser Exp $")
 
 /* -*- mode: c; indent-width: 4; -*- */
 /*
@@ -40,7 +40,7 @@ __CIDENT_RCSID(gr_w32_signal_c,"$Id: w32_signal.c,v 1.4 2022/06/12 16:08:44 cvsu
 #include <unistd.h>
 #include <signal.h>
 
-#if !defined(__MINGW64__)
+#if !defined(__MINGW32__)
 /*
 //  NAME
 //      sigemptyset - initialize and empty a signal set
