@@ -29,6 +29,9 @@
 #include <unistd.h>
 #include <assert.h>
 
+extern int daemonize(int nochdir, int noclose);
+extern int setgid(int groupid);
+extern int setuid(int uid);
 
 int
 daemonize(int nochdir, int noclose)

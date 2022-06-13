@@ -1,5 +1,5 @@
 # -*- mode: mak; indent-tabs-mode: t; tab-width: 8 -*-
-# $Id: Makefile.in,v 1.7 2022/06/12 16:12:44 cvsuser Exp $
+# $Id: Makefile.in,v 1.8 2022/06/13 05:34:01 cvsuser Exp $
 # memcached_service Makefile
 #
 #
@@ -52,6 +52,7 @@ endif
 RM=		@RM@
 RC=		@RC@
 PERL=		@PERL@
+LIBTOOL=	@LIBTOOL@
 
 # Configuration
 
@@ -136,7 +137,11 @@ RESOURCES=\
 
 OBJS+=		$(addprefix $(D_OBJ)/,$(subst .cpp,$(O),$(CPPSOURCES)))
 OBJS+=		$(addprefix $(D_OBJ)/,$(subst .c,$(O),$(CSOURCES)))
+ifeq (mingw,$(findstring mingw,"@TOOLCHAIN@"))
+OBJS+=		$(addprefix $(D_OBJ)/,$(subst .rc,_res.o,$(RESOURCES)))
+else
 OBJS+=		$(addprefix $(D_OBJ)/,$(subst .rc,.res,$(RESOURCES)))
+endif
 
 XCLEAN=		service_license.h bsd_license.h
 
@@ -163,7 +168,7 @@ bsd_license.h:		bsd_license.txt mklicense.pl
 $(D_BIN)/$(TARGET):	MAPFILE=$(basename $@).map
 $(D_BIN)/$(TARGET):	LINKLIBS=-lmemcached -levent -lsthread -lcompat
 $(D_BIN)/$(TARGET):	$(D_OBJ)/.created $(OBJS) $(RESOURCES)
-		$(CC) $(LDFLAGS) -o $@ $(OBJS) $(LDLIBS) @LDMAPFILE@
+		$(LIBTOOL) --mode=link $(CC) $(LDFLAGS) -o $@ $(OBJS) $(LDLIBS) @LDMAPFILE@
 
 $(D_OBJ)/.created:
 		-@mkdir $(D_OBJ)
@@ -178,7 +183,10 @@ $(D_OBJ)/%$(O):		%$(C)
 $(D_OBJ)/%$(O):		%.cpp
 		$(CXX) $(CXXFLAGS) -o $@ -c $<
 
-$(D_OBJ)/%.res: 	%.rc
-		$(RC) -Fo$@ -I../include -I../libNTService $<
+$(D_OBJ)/%.res:		%.rc
+		$(RC) -I../include -I../libNTService -Fo$@ $<
+
+$(D_OBJ)/%_res.o:	%.rc
+		$(RC) -I../include -I../libNTService -o $@ $<
 
 #end

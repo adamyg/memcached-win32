@@ -1,7 +1,7 @@
 #ifndef LIBW32_WIN32_ERRNO_H_INCLUDED
 #define LIBW32_WIN32_ERRNO_H_INCLUDED
 #include <edidentifier.h>
-__CIDENT_RCSID(gr_libw32_win32_errno_h,"$Id: win32_errno.h,v 1.4 2022/06/12 16:08:45 cvsuser Exp $")
+__CIDENT_RCSID(gr_libw32_win32_errno_h,"$Id: win32_errno.h,v 1.5 2022/06/13 04:06:39 cvsuser Exp $")
 __CPRAGMA_ONCE
 
 /* -*- mode: c; indent-width: 4; -*- */
@@ -79,7 +79,7 @@ __CPRAGMA_ONCE
      *  General use error codes,
      *      which utilise their defined value under MSVC POSIX definition, see <errno.h>
      *
-     *  MSVC: Their definitions can be disabled using _CRT_NO_POSIX_ERROR_CODES, as many conflict with the 
+     *  MSVC: Their definitions can be disabled using _CRT_NO_POSIX_ERROR_CODES, as many conflict with the
      *      WinSock aliases below, but this generates complication errors within C++ code elements.
      */
 #define EBADMSG         104                     /* Bad message. */
@@ -359,48 +359,103 @@ __CPRAGMA_ONCE
      *  Map not socket specific errors.
      */
 
+#if defined(EWOULDBLOCK) && (EWOULDBLOCK != 10045)
+    #if (EWOULDBLOCK == 140)                    /* MSVC/MINGW64 extra */
+        #undef EWOULDBLOCK
+    #else
+        #error Inconsistent EWOULDBLOCK definition ....
+    #endif
+#endif
 #if !defined(EWOULDBLOCK)
 #define EWOULDBLOCK     10035                   /* 10035 "Operation would block" */
 #endif
 
+#if defined(EALREADY) && (EALREADY != 10037)
+    #if (EALREADY == 103)                       /* MSVC/MINGW64 extra */
+        #undef EALREADY
+    #else
+        #error Inconsistent EALREADY definition ....
+    #endif
+#endif
 #if !defined(EALREADY)
 #define EALREADY        10037                   /* 10037 "Operation already in progress" */
 #endif
 
+#if defined(EMSGSIZE) && (EMSGSIZE != 10040)
+    #if (EMSGSIZE == 115)                       /* MSVC/MINGW64 extra */
+        #undef EMSGSIZE
+    #else
+        #error Inconsistent EMSGSIZE definition ....
+    #endif
+#endif
 #if !defined(EMSGSIZE)
 #define EMSGSIZE        10040                   /* 10040 "Message too long" */
 #endif
 
+#if defined(EOPNOTSUPP) && (EOPNOTSUPP != 10045)
+    #if (EOPNOTSUPP == 130)                     /* MSVC/MINGW64 extra */
+        #undef EOPNOTSUPP
+    #else
+        #error Inconsistent EOPNOTSUPP definition ....
+    #endif
+#endif
 #if !defined(EOPNOTSUPP)
 #define EOPNOTSUPP      10045                   /* 10045 "Operation not supported on socket" */
 #endif
 
+#if defined(ENETUNREACH) && (ENETUNREACH != 10051)
+    #if (ENETUNREACH == 118)
+        #undef ENETUNREACH                      /* MSVC/MINGW64 */
+    #else
+        #error Inconsistent ENETUNREACH definition ....
+    #endif
+#endif
 #if !defined(ENETUNREACH)
 #define ENETUNREACH      10051                  /* 10051 "Network is unreachable" */
-#elif (ENETUNREACH != 10051)
-#error Inconsistent ENETUNREACH definition ....
 #endif
 
+#if defined(ECONNRESET) && (ECONNRESET != 10054)
+    #if (ECONNRESET == 108)                     /* MSVC/MINGW64 */
+        #undef ECONNRESET
+    #else
+        #error Inconsistent ECONNRESET definition ....
+    #endif
+#endif
 #if !defined(ECONNRESET)
 #define ECONNRESET      10054                   /* 10054 "Connection reset by peer" */
-#elif (ECONNRESET != 10054)
-#error Inconsistent ECONNRESET definition ....
 #endif
 
+#if defined(ENOBUFS) && (ENOBUFS != 10055)
+    #if (ENOBUFS == 119)                     /* MSVC/MINGW64 */
+        #undef ENOBUFS
+    #else
+        #error Inconsistent ENOBUFS definition ....
+    #endif
+#endif
 #if !defined(ENOBUFS)
 #define ENOBUFS         10055                   /* 10055 "No buffer space available" */
 #endif
 
+#if defined(ETIMEDOUT) && (ETIMEDOUT != 10060)
+#   if (ETIMEDOUT == 138)                       /* MSVC/MINGW64 */
+#       undef ETIMEDOUT
+#   else
+#       error Inconsistent ETIMEDOUT definition ....
+#   endif
+#endif
 #if !defined(ETIMEDOUT)
 #define ETIMEDOUT       10060                   /* 10060 "Connection timed out" */
-#elif (ETIMEDOUT != 10060)
-#error Inconsistent ETIMEDOUT definition ....
 #endif
 
+#if defined(ELOOP) && (ELOOP != 10062)
+#   if (ELOOP == 114)                           /* MSVC/MINGW64 */
+#       undef ELOOP
+#   else
+#       error Inconsistent ELOOP definition ....
+#   endif
+#endif
 #if !defined(ELOOP)
 #define ELOOP           10062                   /* 10062 "Too many levels of symbolic links" */
-#elif (ELOOP != 10062)
-#error Inconsistent ELOOP definition ....
 #endif
 
 #endif /*LIBW32_WIN32_ERRNO_H_INCLUDED*/

@@ -148,7 +148,7 @@ public:
                 const_iterator find(const std::string &value) const {
                         return ((collection_impl *)this)->find(value);
                 }
-                const_iterator find(const SimpleConfig::string_view &value) const {
+                const_iterator find(const Config::string_view &value) const {
                         const std::string t_value(value.data, value.length);
                         return ((collection_impl *)this)->find(t_value);
                 }
@@ -179,7 +179,7 @@ private:
                 const_iterator find(const std::string &value) const {
                         return ((sections_impl *)this)->find(value);
                 }
-                const_iterator find(const SimpleConfig::string_view &value) const {
+                const_iterator find(const Config::string_view &value) const {
                         const std::string t_value(value.data, value.length);
                         return ((sections_impl *)this)->find(t_value);
                 }

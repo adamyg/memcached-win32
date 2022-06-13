@@ -57,7 +57,7 @@ public:
                 {
                 }
 
-                int (__cdecl *service_main)(int argc, const char **);
+                int (__cdecl *service_main)(int argc, const char * const *);
                 void (__cdecl *service_shutdown)(int ret);
 
                 int argc;

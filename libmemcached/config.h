@@ -3,15 +3,17 @@
  */
 
 #if defined(_WIN32)
+
 #if defined(NDEBUG)                             // non-assert
-#if defined(_DEBUG)
-#error NDEBUG and _DEBUG are mutually exclusive
-#endif
+    #if defined(_DEBUG)
+        #error NDEBUG and _DEBUG are mutually exclusive.
+    #endif
 #else
-#if !defined(_DEBUG)
-#error NDEBUG and _DEBUG are mutually exclusive
-#endif
+    #if !defined(_DEBUG) && !defined(__MINGW64__)
+        #error Exactly one of NDEBUG and _DEBUG needs to be defined.
+    #endif
 #endif //NDEBUG
+
 #if !defined(WIN32PORT)
 #define WIN32PORT 1                             // enable windows tweaks
 #endif
@@ -22,12 +24,12 @@
 #include <libcompat.h>
 #endif
 
-#if defined(_MSC_VER) || defined(__WATCOMC__)
-#if !defined(LIBW32_SOCKET_MAP_NATIVE)
-#define LIBW32_SOCKET_MAP_NATIVE 1              /* enable socket function mapping */
+#if defined(_MSC_VER) || defined(__WATCOMC__) || defined(__MINGW32__)
+#if !defined(WIN32_SOCKET_MAP_NATIVE)
+#define WIN32_SOCKET_MAP_NATIVE 1               /* enable socket function mapping */
 #endif
-#if !defined(LIBW32_UNISTD_MAP)
-#define LIBW32_UNISTD_MAP 1                     /* enable unistd function mapping */
+#if !defined(WIN32_UNISTD_MAP)
+#define WIN32_UNISTD_MAP 1                      /* enable unistd function mapping */
 #endif
 #endif
 
@@ -94,7 +96,7 @@
 
 /* Define to 1 if support getopt_long */
 #if !defined(HAVE_GETOPT_LONG)
-#if defined(_MSC_VER) || defined(__WATCOMC__)
+#if defined(_MSC_VER) || defined(__WATCOMC__) || defined(__MINGW32__)
 #define HAVE_GETOPT_LONG 1
 #endif
 #endif
@@ -243,9 +245,10 @@
 #include <sys/socket.h>
 #include <unistd.h>
 
+extern int daemonize(int nochdir, int noclose);
 extern int setgid(int groupid);
 extern int setuid(int uid);
-       
+
 #include "memcached_package.h"
 #include "libmemcached.h"
 

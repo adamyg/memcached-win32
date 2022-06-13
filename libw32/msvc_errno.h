@@ -1,5 +1,5 @@
 /*
- *  $Id: msvc_errno.h,v 1.4 2022/06/12 16:08:43 cvsuser Exp $
+ *  $Id: msvc_errno.h,v 1.5 2022/06/13 03:23:45 cvsuser Exp $
  *  MSVC errno filter
  *
  * This file is part of memcached-win32.
@@ -38,7 +38,7 @@
 #undef EINPROGRESS      //112
 #undef EISCONN          //113
 #undef ELOOP            //114
-#undef EMSGSIZE         //115g
+#undef EMSGSIZE         //115
 #undef ENETDOWN         //116
 #undef ENETRESET        //117
 #undef ENETUNREACH      //118

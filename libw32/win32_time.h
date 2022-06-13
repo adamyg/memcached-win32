@@ -1,7 +1,7 @@
 #ifndef LIBW32_WIN32_TIME_H_INCLUDED
 #define LIBW32_WIN32_TIME_H_INCLUDED
 #include <edidentifier.h>
-__CIDENT_RCSID(gr_libw32_time_h,"$Id: win32_time.h,v 1.4 2022/06/12 16:08:45 cvsuser Exp $")
+__CIDENT_RCSID(gr_libw32_time_h,"$Id: win32_time.h,v 1.5 2022/06/13 04:06:00 cvsuser Exp $")
 __CPRAGMA_ONCE
 
 /* -*- mode: c; indent-width: 4; -*- */
@@ -33,11 +33,24 @@ __CPRAGMA_ONCE
  */
 
 #include <sys/cdefs.h>
+#include <sys/types.h>
 #include <time.h>
 
 __BEGIN_DECLS
 
+#if !defined(__MINGW32__)
+#if !defined(USECONDS_T)
+#define USECONDS_T 1
+#ifdef _WIN64
+typedef unsigned long long useconds_t;
+#else
+typedef unsigned long useconds_t;
+#endif
+#endif /*USECONDS_T*/
+#endif /*__MINGW32__*/
+
 LIBW32_API unsigned int sleep(unsigned int);
+LIBW32_API int          usleep(useconds_t useconds);
 
 struct timeval;
 struct timezone;

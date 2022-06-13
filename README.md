@@ -2,4 +2,5 @@
 
 # memcached-win32
 
-memcached 1.6.6 windows service.
+memcached 1.6.15 windows service.
+

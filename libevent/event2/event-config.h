@@ -171,7 +171,9 @@
 /* #undef EVENT__HAVE_STRSEP */
 
 /* Define to 1 if you have the `strtok_r' function. */
-/* #undef EVENT__HAVE_STRTOK_R */
+#if defined(HAVE_STRTOK_R)
+#define EVENT__HAVE_STRTOK_R 1
+#endif
 
 /* Define to 1 if you have the `strtoll' function. */
 /* #define EVENT__HAVE_STRTOLL 1 */

@@ -260,20 +260,10 @@ extern int clock_gettime(int clockid, struct timespec *time_spec);
 #endif
 #endif
 
-#if !defined(__MINGW32__)
-#if !defined(USECONDS_T)
-#define USECONDS_T 1
-#ifdef _WIN64
-typedef unsigned long long useconds_t;
-#else
-typedef unsigned long useconds_t;
-#endif
-#endif /*USECONDS_T*/
-#endif /*__MINGW32__*/
-
-int usleep(useconds_t useconds);
-//libcompat
-//unsigned sleep(unsigned seconds);
+/*libw32/unistd
+ *  int usleep(useconds_t useconds);
+ *  unsigned sleep(unsigned seconds);
+ */
 
 #ifdef __cplusplus
 }

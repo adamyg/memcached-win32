@@ -34,6 +34,7 @@
 #include <assert.h>
 #include <unistd.h>
 
+#undef bind
 #include "Service.h"                            // Service implementation.
 
 #include "../libNTService/NTServiceConfig.h"    // CNTServiceConfig
