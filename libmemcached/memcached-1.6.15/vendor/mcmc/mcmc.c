@@ -464,6 +464,13 @@ int mcmc_connect(void *c, char *host, char *port, int options) {
         }
 
         if (options & MCMC_OPTION_NONBLOCK) {
+#if defined(WIN32PORT)
+            if (socknonblockingio(sock, 0) < 0) {
+                res = MCMC_ERR;
+                close(sock);
+                goto end;
+            }
+#else
             int flags = fcntl(sock, F_GETFL);
             if (flags < 0) {
                 res = MCMC_ERR;
@@ -475,6 +482,7 @@ int mcmc_connect(void *c, char *host, char *port, int options) {
                 close(sock);
                 goto end;
             }
+#endif
             res = MCMC_CONNECTING;
 
             if (connect(sock, next->ai_addr, next->ai_addrlen) != -1) {

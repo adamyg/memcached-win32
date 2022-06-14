@@ -99,11 +99,13 @@ RMDFLAGS=	-rf
 #VPATH=		memcached-1.6.6
 VERSION=	1.6.15
 VPATH=		memcached-1.6.15
+ENABLE_PROXY=	yes
+ENABLE_TLS=	no
 
 LIBROOT=	memcached
 
 #	daemon.c \
-#	solaris_priv.c \ 
+#	solaris_priv.c \
 #	linux_priv.c \
 #	openbsd_priv.c \
 #	freebsd_priv.c \
@@ -112,7 +114,7 @@ LIBROOT=	memcached
 
 LIBCSOURCES=\
 	memcached.c \
-	hash.c \ 
+	hash.c \
 	jenkins_hash.c \
 	murmur3_hash.c \
 	slabs.c \
@@ -120,13 +122,13 @@ LIBCSOURCES=\
 	assoc.c \
 	thread.c \
 	stats_prefix.c \
-	util.c \ 
+	util.c \
 	cache.c \
 	bipbuffer.c \
 	logger.c \
 	crawler.c \
 	itoa_ljust.c \
-	slab_automove.c \ 
+	slab_automove.c \
 	authfile.c \
 	restart.c \
 	extstore.c \
@@ -134,11 +136,33 @@ LIBCSOURCES=\
 	storage.c \
 	slab_automove_extstore.c
 
+ifeq ("$(ENABLE_TLS)","yes")
+LIBCSOURCES+=\
+	tls.c
+endif
+
 ifeq ("$(VERSION)","1.6.15")
 LIBCSOURCES+=\
 	base64.c\
 	proto_bin.c\
 	proto_text.c
+
+ifeq ("$(ENABLE_PROXY)","yes")
+CEXTRA+=	-DPROXY=1
+LIBCSOURCES+=\
+	vendor\mcmc\mcmc.c \
+	proto_proxy.c \
+	proxy_xxhash.c \
+	proxy_await.c \
+	proxy_ustats.c \
+	proxy_jump_hash.c \
+	proxy_request.c \
+	proxy_network.c \
+	proxy_lua.c \
+	proxy_config.c \
+	proxy_ring_hash.c \
+	md5.c
+endif
 endif
 
 LIBHSOURCES=\
@@ -189,11 +213,15 @@ $(LIBRARY):		$(LIBOBJS)
 .PHONY:		installinc
 installinc:		../include/.created
 		@echo publishing headers ...
+		@cp -f memcached_package.h ../include
 
 memcached_package.h:	Makefile
 		$(PERL) ./package.pl --name "memcached" --version "$(VERSION)"
 
-directories:	$(D_OBJ)/.created
+directories:	\
+	$(D_OBJ)/.created \
+	$(D_OBJ)/vendor/.created \
+	$(D_OBJ)/vendor/mcmc/.created
 
 %/.created:
 		-@mkdir $(@D)
@@ -202,7 +230,7 @@ directories:	$(D_OBJ)/.created
 clean:
 		@echo $(BUILD_TYPE) clean
 		-@$(RM) $(RMFLAGS) $(BAK) $(LIBRARY) $(LIBOBJS) $(CLEAN) $(XCLEAN) >/dev/null 2>&1
-		-@$(RM) $(RMFLAGS) ../include/a_out.h >/dev/null 2>&1
+		-@$(RM) $(RMFLAGS) ../include/memcached_*.h >/dev/null 2>&1
 
 $(D_OBJ)/%$(O): 	%$(C)
 		$(CC) $(CFLAGS) -o $@ -c $<

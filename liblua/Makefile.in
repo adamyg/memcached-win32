@@ -219,6 +219,8 @@ installinc:		.headers.$(VERSION)
 		@echo publishing headers ...
 		@cp -f $(SRCDIR)/lua.h ../include
 		@cp -f $(SRCDIR)/luaconf.h ../include
+		@cp -f $(SRCDIR)/lualib.h ../include
+		@cp -f $(SRCDIR)/lauxlib.h ../include
 		@echo "do not delete, managed file" > $@
 
 directories:	$(D_OBJ)/.created ../include/.created
