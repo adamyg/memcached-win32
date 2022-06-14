@@ -1,5 +1,5 @@
 #!/usr/bin/perl
-# $Id: makelib.in,v 1.4 2022/06/13 05:34:00 cvsuser Exp $
+# $Id: makelib.in,v 1.5 2022/06/14 13:09:19 cvsuser Exp $
 # -*- mode: perl; tabs: 8; indent-width: 4; -*-
 # makelib configuration
 #
@@ -46,6 +46,8 @@ $PACKAGE_FILE   = 'package.h';
         'compat',
         'sthread',
         'event',
+        'lua54_static',
+        'lua54',
         'memcached'
         );
 
@@ -63,6 +65,7 @@ $PACKAGE_FILE   = 'package.h';
         'libcompat',
         'libsthread',
         'libevent',
+        'liblua',
         'libmemcached',
         'libNTService',
         'service'
