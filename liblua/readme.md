@@ -1,20 +1,19 @@
 # Introduction
 
-        [Lua](https://www.lua.org/) is a powerful, efficient, lightweight, embeddable scripting language. It
-        supports procedural programming, object-oriented programming, functional
-        programming, data-driven programming, and data description.
+[Lua](https://www.lua.org/) is a powerful, efficient, lightweight, embeddable scripting language. It
+supports procedural programming, object-oriented programming, functional
+programming, data-driven programming, and data description.
 
-        Lua combines simple procedural syntax with powerful data description constructs
-        based on associative arrays and extensible semantics. Lua is dynamically typed,
-        runs by interpreting bytecode with a register-based virtual machine, and has
-        automatic memory management with incremental garbage collection, making it
-        ideal for configuration, scripting, and rapid prototyping.
+Lua combines simple procedural syntax with powerful data description constructs
+based on associative arrays and extensible semantics. Lua is dynamically typed,
+runs by interpreting bytecode with a register-based virtual machine, and has
+automatic memory management with incremental garbage collection, making it
+ideal for configuration, scripting, and rapid prototyping.
 
 # License
 
-        [Lua License 5.0.0+](https://www.lua.org/license.html)
+[Lua License 5.0.0+](https://www.lua.org/license.html)
 
-''''
         Lua is free software distributed under the terms of the MIT license reproduced
         here. Lua may be used for any purpose, including commercial purposes, at
         absolutely no cost. No paperwork, no royalties, no GNU-like "copyleft"
@@ -39,9 +38,9 @@
         the exact license text for each version before Lua 5.0. Nevertheless, if you
         wish to use those old versions, you may hereby assume that they have all been
         re-licensed under the MIT license as described above.
-''''
 
-''''
+----------------
+
         Copyright, 1994-2021 Lua.org, PUC-Rio.
 
         Permission is hereby granted, free of charge, to any person obtaining
@@ -63,6 +62,3 @@
         ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
         CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
         SOFTWARE.
-
-''''
-
