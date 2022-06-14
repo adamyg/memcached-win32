@@ -35,6 +35,16 @@ jobs:
       with:
         arch: x86
 
+    - name: vcpkgs
+      if: startsWith(matrix.config.name, 'Windows Latest MSVC')
+      shell: cmd
+      run: |
+        git clone https://github.com/microsoft/vcpkg ../vcpkg
+        call ..\vcpkg\bootstrap-vcpkg.bat
+        ..\vcpkg\vcpkg install
+        ..\vcpkg\vcpkg integrate install
+        dir /S .\vcpkg_installed
+
     - name: MinGW64 setup
       if: startsWith(matrix.config.name, 'Windows Latest MinGW')
       shell: cmd
