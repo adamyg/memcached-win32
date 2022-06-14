@@ -43,6 +43,7 @@ RM=		@RM@
 
 # Configuration
 
+TOOLCHAIN=	"@TOOLCHAIN@"
 ifeq ("$(BUILD_TYPE)","")	#default
 BUILD_TYPE=	debug
 MAKEFLAGS+=	BUILD_TYPE=debug
@@ -78,6 +79,8 @@ CINCLUDE=	-I. -I$(D_INC) @CINCLUDE@
 
 CEXTRA=		-DWIN32PORT @DEFS@ -DWIN32_SOCKET_MAP_NATIVE -DLIBW32_DYNAMIC
 
+include ../libopenssl.inc
+
 ifeq ("$(BUILD_TYPE)","release")
 CFLAGS+=	$(CRELEASE) $(CWARN) $(CINCLUDE) $(CEXTRA) $(XFLAGS)
 LDFLAGS=	$(LDRELEASE) @LDFLAGS@
@@ -100,7 +103,7 @@ RMDFLAGS=	-rf
 VERSION=	1.6.15
 VPATH=		memcached-1.6.15
 ENABLE_PROXY=	yes
-ENABLE_TLS=	no
+ENABLE_TLS=	$(HAVE_OPENSSL)
 
 LIBROOT=	memcached
 
@@ -137,6 +140,7 @@ LIBCSOURCES=\
 	slab_automove_extstore.c
 
 ifeq ("$(ENABLE_TLS)","yes")
+CEXTRA+=	-DTLS=1
 LIBCSOURCES+=\
 	tls.c
 endif

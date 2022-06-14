@@ -1,5 +1,5 @@
 # -*- mode: mak; indent-tabs-mode: t; tab-width: 8 -*-
-# $Id: Makefile.in,v 1.9 2022/06/14 14:58:18 cvsuser Exp $
+# $Id: Makefile.in,v 1.10 2022/06/14 16:48:21 cvsuser Exp $
 # memcached_service Makefile
 #
 #
@@ -50,12 +50,15 @@ ifeq ("$(CXX)","")
 CXX=		$(CC)
 endif
 RM=		@RM@
+RMDIR=		@RMDIR@
+CP=		@CP@
 RC=		@RC@
 PERL=		@PERL@
 LIBTOOL=	@LIBTOOL@
 
 # Configuration
 
+TOOLCHAIN=	"@TOOLCHAIN@"
 ifeq ("$(BUILD_TYPE)","")	#default
 BUILD_TYPE=	debug
 MAKEFLAGS+=	BUILD_TYPE=debug
@@ -92,6 +95,8 @@ LDRELEASE=	@LDRELEASE@
 
 CINCLUDE=	-I. -I$(D_INC) @CINCLUDE@
 CEXTRA=		@DEFS@ -DWIN32_SOCKET_MAP_NATIVE -DLIBW32_DYNAMIC
+
+include ../libopenssl.inc
 
 ifeq ("$(BUILD_TYPE)","release")
 CFLAGS+=	$(CRELEASE) $(CWARN) $(CINCLUDE) $(CEXTRA) $(XFLAGS)
@@ -145,12 +150,17 @@ endif
 
 XCLEAN=		service_license.h bsd_license.h
 
+IMPORT=
+ifneq ("$(OPENSSL_DLLS)","")
+IMPORT=		$(addprefix $(D_BIN)/,$(OPENSSL_DLLS))
+endif
+
 
 #########################################################################################
 # Rules
 
 .PHONY:			build resources release debug
-build:		resources $(D_BIN)/$(TARGET)
+build:		resources $(D_BIN)/$(TARGET) import
 
 release:
 		$(MAKE) BUILD_TYPE=release $(filter-out release, $(MAKECMDGOALS))
@@ -165,17 +175,28 @@ service_license.h:	../LICENSE mklicense.pl
 bsd_license.h:		bsd_license.txt mklicense.pl
 		@$(PERL) mklicense.pl $< $@ bsd_license
 
-$(D_BIN)/$(TARGET):	MAPFILE=$(basename $@).map
-$(D_BIN)/$(TARGET):	LINKLIBS=-lmemcached -llua54 -levent -lsthread -lcompat
-$(D_BIN)/$(TARGET):	$(D_OBJ)/.created $(OBJS) $(RESOURCES)
-		$(LIBTOOL) --mode=link $(CC) $(LDFLAGS) -o $@ $(OBJS) $(LDLIBS) @LDMAPFILE@
-
 $(D_OBJ)/.created:
 		-@mkdir $(D_OBJ)
 		@echo "do not delete" > $@
 
+.PHONY:			import
+import:				$(IMPORT)
+
+.PHONY:		vclean
+vclean:		clean
+		-$(RM) $(IMPORT) >nul 2>&1
+
 clean:
 		-@$(RM) $(RMFLAGS) $(BAK) $(D_BIN)/$(TARGET) $(TARGET) $(OBJS) $(CLEAN) $(XCLEAN) >/dev/null 2>&1
+
+
+#########################################################################################
+# Applications
+
+$(D_BIN)/$(TARGET):	MAPFILE=$(basename $@).map
+$(D_BIN)/$(TARGET):	LINKLIBS=-lmemcached -llua54 -levent -lsthread -lcompat $(OPENSSL_LIBS)
+$(D_BIN)/$(TARGET):	$(D_OBJ)/.created $(OBJS) $(RESOURCES)
+		$(LIBTOOL) --mode=link $(CC) $(LDFLAGS) -o $@ $(OBJS) $(LDLIBS) @LDMAPFILE@
 
 $(D_OBJ)/%$(O):		%$(C)
 		$(CC) $(CFLAGS) -o $@ -c $<
@@ -183,10 +204,20 @@ $(D_OBJ)/%$(O):		%$(C)
 $(D_OBJ)/%$(O):		%.cpp
 		$(CXX) $(CXXFLAGS) -o $@ -c $<
 
+
+#########################################################################################
+# Resources
+
 $(D_OBJ)/%.res:		%.rc
 		$(RC) -I../include -I../libNTService -Fo$@ $<
 
 $(D_OBJ)/%_res.o:	%.rc
 		$(RC) -I../include -I../libNTService -o $@ $<
+
+ifneq ("$(OPENSSL_DLLS)","")
+$(D_BIN)/%.dll:		$(OPENSSL_BIN)/%.dll
+		@echo importing $@ ..
+		@$(CP) $^ $@
+endif
 
 #end

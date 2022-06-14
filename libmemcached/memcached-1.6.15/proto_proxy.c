@@ -50,10 +50,11 @@ void process_proxy_stats(ADD_STAT add_stats, conn *c) {
     struct proxy_user_stats *us = &ctx->user_stats;
 #if defined(WIN32PORT)
     uint64_t *counters = alloca(sizeof(uint64_t) * us->num_stats);
+    memset(counters, 0, sizeof(uint64_t) * us->num_stats);
 #else
     uint64_t counters[us->num_stats];
-#endif
     memset(counters, 0, sizeof(counters));
+#endif
 
     // aggregate worker thread counters.
     for (int x = 0; x < settings.num_threads; x++) {
