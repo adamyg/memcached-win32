@@ -2,7 +2,7 @@
 # libcompat makefile.
 #
 #
-# Copyright (c) 2020, Adam Young.
+# Copyright (c) 2020 - 2022, Adam Young.
 # All rights reserved.
 #
 # The applications are free software: you can redistribute it
@@ -159,12 +159,10 @@ $(LIBRARY):		$(LIBOBJS)
 		$(RANLIB) $@
 
 $(D_BIN)/dirname$(E):	MAPFILE=$(basename $@).map
-$(D_BIN)/dirname$(E):	LINKLIBS=lcompat
 $(D_BIN)/dirname$(E):	$(D_OBJ)/dirname_main$(O)
 		$(LIBTOOL) --mode=link $(CC) $(LDFLAGS) $^ -o $@ $(LDLIBS) @LDMAPFILE@
 
 $(D_BIN)/basename$(E):	MAPFILE=$(basename $@).map
-$(D_BIN)/basename$(E):	LINKLIBS=lcompat
 $(D_BIN)/basename$(E):	$(D_OBJ)/basename_main$(O)
 		$(LIBTOOL) --mode=link $(CC) $(LDFLAGS) $^ -o $@ $(LDLIBS) @LDMAPFILE@
 

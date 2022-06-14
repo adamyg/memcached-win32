@@ -9,7 +9,7 @@
         #error NDEBUG and _DEBUG are mutually exclusive.
     #endif
 #else
-    #if !defined(_DEBUG) && !defined(__MINGW64__)
+    #if !defined(_DEBUG) && !defined(__MINGW32__)
         #error Exactly one of NDEBUG and _DEBUG needs to be defined.
     #endif
 #endif //NDEBUG
