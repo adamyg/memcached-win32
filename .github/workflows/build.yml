@@ -15,10 +15,16 @@ jobs:
             toolversion: vs170
           }
         - {
-           name: "Windows Latest MinGW",
+           name: "Windows Latest MinGW64",
            os: windows-latest,
            toolchain: mingw64,
            toolversion: mingw64
+          }
+        - {
+           name: "Windows Latest MinGW32",
+           os: windows-latest,
+           toolchain: mingw32,
+           toolversion: mingw32
           }
     steps:
 
@@ -46,13 +52,20 @@ jobs:
         dir /S .\vcpkg_installed
 
     - name: MinGW64 setup
-      if: startsWith(matrix.config.name, 'Windows Latest MinGW')
+      if: startsWith(matrix.config.name, 'Windows Latest MinGW64')
       shell: cmd
       run: |
         c:\msys64\usr\bin\pacman --noconfirm -S base-devel
         c:\msys64\usr\bin\pacman --noconfirm -S mingw-w64-x86_64-gcc
-        c:\msys64\usr\bin\pacman --noconfirm -S mingw-w64-i686-gcc
         c:\msys64\usr\bin\pacman --noconfirm -S mingw-w64-x86_64-openssl
+        dir c:\msys64\usr\bin
+
+    - name: MinGW32 setup
+      if: startsWith(matrix.config.name, 'Windows Latest MinGW32')
+      shell: cmd
+      run: |
+        c:\msys64\usr\bin\pacman --noconfirm -S base-devel
+        c:\msys64\usr\bin\pacman --noconfirm -S mingw-w64-i686-gcc
         c:\msys64\usr\bin\pacman --noconfirm -S mingw-w64-i686-openssl
         dir c:\msys64\usr\bin
 
