@@ -1,5 +1,5 @@
 # -*- mode: mak; -*-
-# $Id: Makefile.in,v 1.4 2022/06/12 16:10:56 cvsuser Exp $
+# $Id: Makefile.in,v 1.6 2022/06/14 14:49:52 cvsuser Exp $
 # memcached-win32 makefile.
 #
 #
@@ -264,9 +264,10 @@ LIBS+=\
 	$(LW)compat$(A)			\
 	$(LW)sthread$(A)		\
 	$(LW)event$(A)			\
+	$(LW)lua$(A)			\
 	$(LW)memcached$(A)		\
 	$(LW)NTService$(A)
-        
+
 IMPORT=
 ifeq ("wcl386","$(CC)")
 IMPORT+=\
@@ -389,12 +390,14 @@ install:		all
 
 clean:
 		@echo $(BUILD_TYPE) clean
-		$(MAKE) -C libw32 clean
-		$(MAKE) -C libcompat clean
-		$(MAKE) -C libsthread clean
-		$(MAKE) -C libevent clean
-		$(MAKE) -C libNTService clean
 		$(MAKE) -C service clean
+		$(MAKE) -C libNTService clean
+		$(MAKE) -C libmemcached clean
+		$(MAKE) -C liblua clean
+		$(MAKE) -C libevent clean
+		$(MAKE) -C libsthread clean
+		$(MAKE) -C libcompat clean
+		$(MAKE) -C libw32 clean
 
 vclean:			clean
 		-@$(RM) $(RMDFLAGS) $(D_BIN)/* $(D_MACROS)/* $(D_HELP)/* $(D_LIB)/* $(D_OBJ)/*
@@ -404,6 +407,8 @@ distclean:		clean
 		$(RM) $(RMFLAGS) config.cache config.log config.status \
 			service/Makefile \
 			libNTService/Makefile \
+			libmemcached/Makefile \
+			liblua/Makefile \
 			libevent/Makefile \
 			libsthread/Makefile \
 			libcompat/Makefile \

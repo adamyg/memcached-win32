@@ -1,8 +1,8 @@
 # -*- mode: mak; indent-tabs-mode: t; tab-width: 8 -*-
-# libevent makefile.
+# liblua 5.4.4 makefile.
 #
 #
-# Copyright (c) 2020 - 2022, Adam Young.
+# Copyright (c) 2022, Adam Young.
 # All rights reserved.
 #
 # The applications are free software: you can redistribute it
@@ -36,6 +36,7 @@ top_builddir=	@top_builddir@
 
 C=		.c
 O=		.o
+E=
 H=		.h
 A=		.a
 LP=		lib
@@ -49,6 +50,9 @@ CC=		@CC@
 AR=		@AR@
 RANLIB= 	@RANLIB@
 RM=		@RM@
+PERL=		@PERL@
+LIBTOOL=	@LIBTOOL@
+RC=		@RC@
 
 # Configuration
 
@@ -64,13 +68,14 @@ endif
 
 D_INC=		$(ROOT)/include
 D_BIN=		$(ROOT)/bin@TOOLCHAINEXT@/$(BUILD_TYPE)
-D_OBJ=		$(ROOT)/objects@TOOLCHAINEXT@/$(BUILD_TYPE)/libevent
+D_OBJ=		$(ROOT)/objects@TOOLCHAINEXT@/$(BUILD_TYPE)/liblua
 D_LIB=		$(ROOT)/lib@TOOLCHAINEXT@/$(BUILD_TYPE)
 
-VERSION=	2.1.12
+VERSION=	5.4.4
+LIBROOT=	lua54
 VERSIONSPEC=	$(subst .,:,$(VERSION))
-PACKED=		libevent-$(VERSION)-stable.tgz
-SRCDIR=		./libevent-$(VERSION)-stable
+PACKED=		lua-$(VERSION).tar.gz
+SRCDIR=		./lua-$(VERSION)/src
 
 # Common flags
 
@@ -84,7 +89,7 @@ LDRELEASE=	@LDRELEASE@
 
 CINCLUDE+=	-I. -I$(SRCDIR)/include -I$(D_INC) @CINCLUDE@
 
-CEXTRA=		@DEFS@
+CEXTRA=		@DEFS@ -DLUA_COMPAT_5_3
 
 ifeq ("$(BUILD_TYPE)","release")
 CFLAGS+=	$(CRELEASE) $(CWARN) $(CINCLUDE) $(CEXTRA) $(XFLAGS)
@@ -94,7 +99,7 @@ CEXTRA+=	-DUSE_DEBUG=1
 CFLAGS+=	$(CDEBUG) $(CWARN) $(CINCLUDE) $(CEXTRA) $(XFLAGS)
 LDFLAGS=	$(LDDEBUG) @LDFLAGS@
 endif
-LDLIBS=		-L$(D_LIB) @LIBS@ @EXTRALIBS@
+LDLIBS=		-L$(D_LIB) $(LINKLIBS) @LIBS@ @EXTRALIBS@
 
 ARFLAGS=	rcv
 RMFLAGS=	-f
@@ -104,52 +109,64 @@ RMDFLAGS=	-rf
 #########################################################################################
 # Targets
 
-LIBROOT=	event
-
-VPATH=		$(SRCDIR)
-
-#		arc4random.c		\
-#		bufferevent_openssl.c	\
-#		epoll_sub.c		\
-#		evthread_pthread.c	\
-#
+VPATH=		. $(SRCDIR)
 
 LIBCSOURCES=\
-		buffer.c		\
-		bufferevent.c		\
-		bufferevent_async.c	\
-		bufferevent_filter.c	\
-		bufferevent_pair.c	\
-		bufferevent_ratelim.c	\
-		bufferevent_sock.c	\
-		buffer_iocp.c		\
-		devpoll.c		\
-		epoll.c			\
-		evdns.c			\
-		event.c			\
-		event_iocp.c		\
-		event_tagging.c		\
-		evmap.c			\
-		evport.c		\
-		evrpc.c			\
-		evthread.c		\
-		evthread_win32.c	\
-		evutil.c		\
-		evutil_rand.c		\
-		evutil_time.c		\
-		http.c			\
-		kqueue.c		\
-		listener.c		\
-		log.c			\
-		poll.c			\
-		select.c		\
-		signal.c		\
-		strlcpy.c		\
-		win32select.c
+		lauxlib.c		\
+		lbaselib.c		\
+		lcorolib.c		\
+		ldblib.c		\
+		liolib.c		\
+		lmathlib.c		\
+		loadlib.c		\
+		loslib.c		\
+		lstrlib.c		\
+		ltablib.c		\
+		lutf8lib.c		\
+		linit.c
+
+CORECSOURCES=\
+		lapi.c			\
+		lcode.c			\
+		lctype.c		\
+		ldebug.c		\
+		ldo.c			\
+		ldump.c			\
+		lfunc.c			\
+		lgc.c			\
+		llex.c			\
+		lmem.c			\
+		lobject.c		\
+		lopcodes.c		\
+		lparser.c		\
+		lstate.c		\
+		lstring.c		\
+		ltable.c		\
+		ltm.c			\
+		lundump.c		\
+		lvm.c			\
+		lzio.c
 
 LIBOBJS=	$(addprefix $(D_OBJ)/,$(subst .c,$(O),$(LIBCSOURCES)))
+LIBOBJS+=	$(addprefix $(D_OBJ)/,$(subst .c,$(O),$(CORECSOURCES)))
+DLLOBJS=	$(subst $(O),.lo,$(LIBOBJS))
 
-LIBRARY=	$(D_LIB)/$(LP)$(LIBROOT)$(A)
+ifeq ("win32","@build_os@")
+ifeq (mingw,$(findstring mingw,"@TOOLCHAIN@"))
+DLLOBJS+=	$(D_OBJ)/liblua_res.o
+else
+DLLOBJS+=	$(D_OBJ)/liblua.res
+endif
+endif
+
+LUALIB=		$(D_LIB)/$(LP)$(LIBROOT)_static$(A)
+LUADLL=		$(D_LIB)/$(LP)$(LIBROOT).la
+
+LIBRARIES=	$(LUALIB) $(LUADLL)
+
+BINARIES=	\
+	$(D_BIN)/lua$(E)		\
+	$(D_BIN)/luac$(E)
 
 INSTALLED=
 
@@ -159,17 +176,24 @@ INSTALLED=
 
 .PHONY:			build release debug
 build:			source unpacked
-unpacked:		directories $(LIBRARY) installinc
+unpacked:		directories version.h $(LIBRARIES) $(BINARIES) installinc
 
 release:
 		$(MAKE) BUILD_TYPE=release $(filter-out release, $(MAKECMDGOALS))
 debug:
 		$(MAKE) BUILD_TYPE=debug $(filter-out debug, $(MAKECMDGOALS))
 
-$(LIBRARY):		$(LIBOBJS)
+$(LUALIB):		$(LIBOBJS)
 		$(RM) $(RMFLAGS) $@
 		$(AR) $(ARFLAGS) $@ $(LIBOBJS)
 		$(RANLIB) $@
+
+INSTALLED+=	$(D_BIN)/lib$(LIBROOT).dll
+$(LUADLL):		CEXTRA += -DLUA_BUILD_AS_DLL
+##$(LUADLL):		DLLDEF = -export-symbols liblua.def -version-number $(VERSIONSPEC)
+$(LUADLL):		$(DLLOBJS)
+		$(LIBTOOL) --mode=link $(CC) $(LDFLAGS) -o $@ \
+			-rpath $(D_LIB) -bindir $(D_BIN) $(DLLDEF) $^ $(LDLIBS)
 
 source:			.unpacked.$(VERSION)
 		$(MAKE) unpacked
@@ -179,16 +203,30 @@ source:			.unpacked.$(VERSION)
 		@gzip -c -d $(PACKED) | tar -xvf -
 		@echo "do not delete, managed file" > $@
 
+$(D_BIN)/lua$(E):	MAPFILE=$(basename $@).map
+$(D_BIN)/lua$(E):	LINKLIBS=-l$(LIBROOT)_static
+$(D_BIN)/lua$(E):	$(D_OBJ)/lua$(O)
+		$(LIBTOOL) --mode=link $(CC) $(LDFLAGS) $^ -o $@ $(LDLIBS) @LDMAPFILE@
+
+$(D_BIN)/luac$(E):	MAPFILE=$(basename $@).map
+$(D_BIN)/luac$(E):	LINKLIBS=-l$(LIBROOT)_static
+$(D_BIN)/luac$(E):	$(D_OBJ)/luac$(O)
+		$(LIBTOOL) --mode=link $(CC) $(LDFLAGS) $^ -o $@ $(LDLIBS) @LDMAPFILE@
+
 .PHONY:		installinc
 installinc:		.headers.$(VERSION)
 .headers.$(VERSION):
 		@echo publishing headers ...
-		@cp -f $(wildcard $(SRCDIR)/include/*.h) ../include
-		@cp -f $(wildcard $(SRCDIR)/include/event2/*.h) ../include/event2
-		@cp -f $(wildcard event2/*.h) ../include/event2
+		@cp -f $(SRCDIR)/lua.h ../include
+		@cp -f $(SRCDIR)/luaconf.h ../include
+		@cp -f $(SRCDIR)/lualib.h ../include
+		@cp -f $(SRCDIR)/lauxlib.h ../include
 		@echo "do not delete, managed file" > $@
 
-directories:	$(D_OBJ)/.created ../include/.created ../include/event2/.created
+directories:	$(D_OBJ)/.created ../include/.created
+
+version.h:		Makefile version.pl
+		@$(PERL) ./version.pl --name "lib$(LIBROOT)" --version "$(VERSION)"
 
 %/.created:
 		-@mkdir $(@D)
@@ -196,10 +234,21 @@ directories:	$(D_OBJ)/.created ../include/.created ../include/event2/.created
 
 clean:
 		@echo $(BUILD_TYPE) clean
-		-@$(RM) $(RMFLAGS) $(BAK) $(INSTALLED) $(LIBRARY) $(LIBOBJS) $(CLEAN) $(XCLEAN) >/dev/null 2>&1
+		-@$(LIBTOOL) --mode=clean $(RM) $(LUADLL) $(DLLOBJS) >/dev/null 2>&1
+		-@$(RM) $(RMFLAGS) $(BAK) $(INSTALLED) $(LUALIB) $(LIBOBJS) $(CLEAN) $(XCLEAN) >/dev/null 2>&1
 		-@$(RM) $(RMFLAGS) ../include/a_out.h >/dev/null 2>&1
 
 $(D_OBJ)/%$(O):		%$(C)
 		$(CC) $(CFLAGS) -o $@ -c $<
 
+$(D_OBJ)/%.lo:		%.c
+		$(LIBTOOL) --mode=compile $(CC) $(CFLAGS) -o $@ -c $<
+
+$(D_OBJ)/%.res:		%.rc
+		$(RC) -fo $@ $<
+
+$(D_OBJ)/%_res.o:	%.rc
+		$(RC) -o $@ $<
+
 #end
+

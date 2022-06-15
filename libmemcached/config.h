@@ -9,7 +9,7 @@
         #error NDEBUG and _DEBUG are mutually exclusive.
     #endif
 #else
-    #if !defined(_DEBUG) && !defined(__MINGW64__)
+    #if !defined(_DEBUG) && !defined(__MINGW32__)
         #error Exactly one of NDEBUG and _DEBUG needs to be defined.
     #endif
 #endif //NDEBUG
@@ -194,10 +194,10 @@
 #endif
 
 /* Set to nonzero if you want to enable TLS */
-#undef  TLS
+    //#undef TLS
 
 /* Version number of package */
-#define VERSION             PACKAGE_VERSION
+#define VERSION PACKAGE_VERSION
 
 /* Define WORDS_BIGENDIAN to 1 if your processor stores words with the most
    significant byte first (like Motorola and SPARC, unlike Intel). */

@@ -21,7 +21,7 @@
   ghost@aladdin.com
 
  */
-/* $Id: md5.h,v 1.1 2022/06/12 16:59:24 cvsuser Exp $ */
+/* $Id: md5.h,v 1.2 2022/06/14 14:52:54 cvsuser Exp $ */
 /*
   Independent implementation of MD5 (RFC 1321).
 
@@ -77,20 +77,20 @@ extern "C"
 
 /* Initialize the algorithm. */
 
-#ifdef WIN32
-_declspec(dllexport)
+#if defined(WIN32) && defined(_DLL)
+__declspec(dllexport)
 #endif
 void md5_init(md5_state_t *pms);
 
 /* Append a string to the message. */
-#ifdef WIN32
-_declspec(dllexport)
+#if defined(WIN32) && defined(_DLL)
+__declspec(dllexport)
 #endif
 void md5_append(md5_state_t *pms, const md5_byte_t *data, int nbytes);
 
 /* Finish the message and return the digest. */
-#ifdef WIN32
-_declspec(dllexport)
+#if defined(WIN32) && defined(_DLL)
+__declspec(dllexport)
 #endif
 void md5_finish(md5_state_t *pms, md5_byte_t digest[16]);
 

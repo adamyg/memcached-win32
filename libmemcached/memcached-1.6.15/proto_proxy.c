@@ -1,4 +1,4 @@
-* -*- Mode: C; tab-width: 4; c-basic-offset: 4; indent-tabs-mode: nil -*- */
+/* -*- Mode: C; tab-width: 4; c-basic-offset: 4; indent-tabs-mode: nil -*- */
 /*
  * Functions for handling the proxy layer. wraps text protocols
  *
@@ -48,8 +48,13 @@ void process_proxy_stats(ADD_STAT add_stats, conn *c) {
 
     // prepare aggregated counters.
     struct proxy_user_stats *us = &ctx->user_stats;
+#if defined(WIN32PORT)
+    uint64_t *counters = alloca(sizeof(uint64_t) * us->num_stats);
+    memset(counters, 0, sizeof(uint64_t) * us->num_stats);
+#else
     uint64_t counters[us->num_stats];
     memset(counters, 0, sizeof(counters));
+#endif
 
     // aggregate worker thread counters.
     for (int x = 0; x < settings.num_threads; x++) {

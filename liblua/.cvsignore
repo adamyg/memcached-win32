@@ -1,0 +1,6 @@
+lua-*
+Makefile
+.headers*
+.unpacked*
+version.h
+

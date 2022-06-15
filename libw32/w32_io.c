@@ -1,5 +1,5 @@
 #include <edidentifier.h>
-__CIDENT_RCSID(gr_w32_io_c,"$Id: w32_io.c,v 1.5 2022/06/13 04:06:39 cvsuser Exp $")
+__CIDENT_RCSID(gr_w32_io_c,"$Id: w32_io.c,v 1.6 2022/06/14 16:43:28 cvsuser Exp $")
 
 /* -*- mode: c; indent-width: 4; -*- */
 /*
@@ -227,7 +227,7 @@ w32_utf8filenames_state (void)
 int
 w32_HTOI(HANDLE handle)
 {
-#if defined(__MINGW64__)
+#if defined(__MINGW32__) || defined(__MINGW64__)
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wpointer-to-int-cast"
 #endif
@@ -236,7 +236,7 @@ w32_HTOI(HANDLE handle)
 #endif
     if (INVALID_HANDLE_VALUE == handle) return -1;
     return (int)handle;
-#if defined(__MINGW64__)
+#if defined(__MINGW32__) || defined(__MINGW64__)
 #pragma GCC diagnostic pop
 #endif
 }
@@ -245,13 +245,13 @@ w32_HTOI(HANDLE handle)
 HANDLE
 w32_ITOH(int fd)
 {
-#if defined(__MINGW64__)
+#if defined(__MINGW32__) || defined(__MINGW64__)
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wint-to-pointer-cast"
 #endif
     if (-1 == fd) return INVALID_HANDLE_VALUE;
     return (HANDLE)fd;
-#if defined(__MINGW64__)
+#if defined(__MINGW32__) || defined(__MINGW64__)
 #pragma GCC diagnostic pop
 #endif
 }
