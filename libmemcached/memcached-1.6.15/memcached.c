@@ -3037,7 +3037,7 @@ static void drive_machine(conn *c) {
             }
             if (!use_accept4) {
 #if defined(WIN32PORT)
-                if (socknonblockingio(sfd, 0) < 0) {
+                if (socknonblockingio(sfd, 1) < 0) {
 #else
                 if (fcntl(sfd, F_SETFL, fcntl(sfd, F_GETFL) | O_NONBLOCK) < 0) {
 #endif
@@ -3457,7 +3457,7 @@ static int new_socket(struct addrinfo *ai) {
     }
 
 #if defined(WIN32PORT)
-    if (socknonblockingio(sfd, 0) < 0) {
+    if (socknonblockingio(sfd, 1) < 0) {
 #else
     if ((flags = fcntl(sfd, F_GETFL, 0)) < 0 ||
         fcntl(sfd, F_SETFL, flags | O_NONBLOCK) < 0) {

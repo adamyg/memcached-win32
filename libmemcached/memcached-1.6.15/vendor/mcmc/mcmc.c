@@ -465,7 +465,7 @@ int mcmc_connect(void *c, char *host, char *port, int options) {
 
         if (options & MCMC_OPTION_NONBLOCK) {
 #if defined(WIN32PORT)
-            if (socknonblockingio(sock, 0) < 0) {
+            if (socknonblockingio(sock, 1) < 0) {
                 res = MCMC_ERR;
                 close(sock);
                 goto end;
