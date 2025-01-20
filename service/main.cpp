@@ -2,7 +2,7 @@
 /*
  * memcached service ...
  *
- * Copyright (c) 2020 - 2022, Adam Young.
+ * Copyright (c) 2020 - 2025, Adam Young.
  * All rights reserved.
  *
  * This file is part of memcached-win32.
@@ -360,7 +360,7 @@ license(void)
 {
 	printf(WINMEMCACHED_PACKAGE " - " WINMEMCACHED_PACKAGE_NAME " " WINMEMCACHED_VERSION "\n\n");
 
-	printf("Copyright (C) 2020-2022 Adam Young, All rights reserved.\n");
+	printf("Copyright (C) 2020-2025 Adam Young, All rights reserved.\n");
 	printf("Licensed under GNU General Public License version 3.0.\n");
 
 	printf("\n\nThis program comes with ABSOLUTELY NO WARRANTY. This is free software,\n");
