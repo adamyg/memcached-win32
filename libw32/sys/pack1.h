@@ -1,10 +1,10 @@
 /* -*- mode: c; indent-width: 4; -*-
- * $Id: pack1.h,v 1.4 2022/06/12 16:08:46 cvsuser Exp $
+ * $Id: pack1.h,v 1.5 2025/01/20 19:13:51 cvsuser Exp $
  * ==noguard==
  *
  * win32 declaration helpers
  *
- * Copyright (c) 1998 - 2022, Adam Young.
+ * Copyright (c) 1998 - 2025, Adam Young.
  * All rights reserved.
  *
  * This file is part of memcached-win32.

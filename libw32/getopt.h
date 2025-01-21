@@ -1,13 +1,13 @@
 #ifndef LIBW32_GETOPT_H_INCLUDED
 #define LIBW32_GETOPT_H_INCLUDED
 #include <edidentifier.h>
-__CIDENT_RCSID(gr_libw32_getopt_h,"$Id: getopt.h,v 1.4 2022/06/12 16:08:42 cvsuser Exp $")
+__CIDENT_RCSID(gr_libw32_getopt_h,"$Id: getopt.h,v 1.6 2025/01/21 08:58:03 cvsuser Exp $")
 __CPRAGMA_ONCE
 /* -*- mode: c; indent-width: 4; -*- */
 /*
  * win <getopt.h>
  *
- * Copyright (c) 1998 - 2022, Adam Young.
+ * Copyright (c) 1998 - 2025, Adam Young.
  * All rights reserved.
  *
  * This file is part of memcached-win32.
@@ -30,8 +30,22 @@ __CPRAGMA_ONCE
  * license for more details.
  * ==end==
  */
-
+ 
 #include <sys/cdefs.h>
+
+#if defined(__MINGW32__)
+
+#include_next <getopt.h>                        /* native getopt.h */
+
+__BEGIN_DECLS
+
+LIBW32_VAR int          optreset;               /* reset getopt */
+
+LIBW32_API int          getopt_long2(int argvc, char * const *argv, const char *options, const struct option *long_options, int *idx, char *buf, int buflen);
+
+__END_DECLS
+
+#else
 
 __BEGIN_DECLS
 
@@ -64,5 +78,11 @@ LIBW32_API int          getopt_long(int argvc, char * const *argv, const char *o
 LIBW32_API int          getopt_long2(int argvc, char * const *argv, const char *options, const struct option *long_options, int *idx, char *buf, int buflen);
 
 __END_DECLS
+
+#endif  /*!__MINGW32__*/
+
+#if defined(LIBW32_LIBRARY)
+extern void __w32_getopt_globals(void);
+#endif
 
 #endif /*LIBW32_GETOPT_H_INCLUDED*/

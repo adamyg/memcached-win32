@@ -1,14 +1,14 @@
 #ifndef LIBW32_SYS_SOCKET_H_INCLUDED
 #define LIBW32_SYS_SOCKET_H_INCLUDED
 #include <edidentifier.h>
-__CIDENT_RCSID(gr_libw32_sys_socket_h,"$Id: socket.h,v 1.4 2022/06/12 16:08:46 cvsuser Exp $")
+__CIDENT_RCSID(gr_libw32_sys_socket_h,"$Id: socket.h,v 1.5 2025/01/20 19:13:51 cvsuser Exp $")
 __CPRAGMA_ONCE
 
 /* -*- mode: c; indent-width: 4; -*- */
 /*
  * win32 <sys/socket.h>
  *
- * Copyright (c) 2012 - 2022, Adam Young.
+ * Copyright (c) 2012 - 2025, Adam Young.
  * All rights reserved.
  *
  * This file is part of memcached-win32.
@@ -190,7 +190,7 @@ LIBW32_API int          w32_poll_native(struct pollfd *fds, int cnt, int timeout
 #define accept(a,b,c)           w32_accept_fd(a,b,c)
 #define poll(a,b,c)             w32_poll_fd(a,b,c)
 #define send(a,b,c,d)           w32_send_fd(a,b,c,d)
-#define sendto(a,b,c,d,e,f      w32_sendto_fd(a,b,c,d,e,f)
+#define sendto(a,b,c,d,e,f)     w32_sendto_fd(a,b,c,d,e,f)
 #define sendmsg(a,b,c)          w32_sendmsg_fd(a,b,c)
 #define recv(a,b,c,d)           w32_recv_fd(a,b,c,d)
 #define recvfrom(a,b,c,d,e,f)   w32_recvfrom_fd(a,b,c,d,e,f)
@@ -241,11 +241,11 @@ LIBW32_API int          w32_poll_native(struct pollfd *fds, int cnt, int timeout
 #define socketpair(a,b,c,d)     w32_socketpair_native(a,b,c,d)
 
 #endif /*WIN32_SOCKET_MAP_FD|NATIVE*/
-                                       
+
 LIBW32_API int                  w32_select(int, fd_set *, fd_set *, fd_set *, const struct timeval *timeout);
-                                       
+
 __END_DECLS
-                                       
+
 /* missing definitions */
 
 #if defined(_MSC_VER) || \
@@ -265,7 +265,8 @@ typedef struct addrinfo ADDRINFOA, *PADDRINFOA;
 VOID WSAAPI freeaddrinfo(PADDRINFOA pAddrInfo);
 #endif
 
-#if defined(__WATCOMC__)
+#if defined(__WATCOMC__) || \
+        (defined(_MSC_VER) && (_MSC_VER <= 1600 /*2010*/))
 #if !defined(HAVE_TIMESPEC)                     /* missing definitions */
 #define HAVE_TIMESPEC
 #endif

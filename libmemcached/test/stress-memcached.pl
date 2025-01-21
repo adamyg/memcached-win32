@@ -12,16 +12,22 @@ unless (@ARGV == 2) {
 
 my $host = shift;
 my $threads = shift;
+my %config = {
+        'servers' => [ $host ],
+        'connect_timeout' => 30.0,
+        'select_timeout' => 30.0,
+        'debug' => 1,
+        };
 
-my $memc = new Cache::Memcached;
-$memc->set_servers([$host]);
+my $memc = new Cache::Memcached(\%config);
+##$memc->set_servers([$host]);
+$memc->enable_compress(0);
 
-unless ($memc->set("foo", "bar") &&
-        $memc->get("foo") eq "bar") {
+unless ($memc->set("foo", "bar") && $memc->get("foo") eq "bar") {
     die "memcached not running at $host ?\n";
 }
-$memc->disconnect_all();
 
+$memc->disconnect_all();
 
 my $running = 0;
 while (1) {

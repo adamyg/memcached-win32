@@ -1,11 +1,11 @@
 #include <edidentifier.h>
-__CIDENT_RCSID(gr_w32_readv_c,"$Id: w32_readv.c,v 1.4 2022/06/12 16:08:44 cvsuser Exp $")
+__CIDENT_RCSID(gr_w32_readv_c,"$Id: w32_readv.c,v 1.5 2025/01/20 19:13:51 cvsuser Exp $")
 
 /* -*- mode: c; indent-width: 4; -*- */
 /*
  * win32 readv() implementation
  *
- * Copyright (c) 2018 - 2022, Adam Young.
+ * Copyright (c) 2018 - 2025, Adam Young.
  * All rights reserved.
  *
  * This file is part of memcached-win32.

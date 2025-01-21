@@ -180,7 +180,7 @@ condition_wait(pthread_cond_t *cond, pthread_mutex_t *mutex, const struct timesp
             }
         }
 
-        assert(COND_MAGIC == mutex->flag);      /* assumed to be initialised */
+        assert(MUTEX_MAGIC == mutex->flag);     /* assumed to be initialised */
         assert(1 == mutex->nest);               /* must be locked once only */
         if (MUTEX_MAGIC != mutex->flag || 1 != mutex->nest) {
             return EINVAL;
@@ -193,7 +193,7 @@ condition_wait(pthread_cond_t *cond, pthread_mutex_t *mutex, const struct timesp
         return (ret ? 0 : (GetLastError() == ERROR_TIMEOUT ? ETIMEDOUT : EINVAL));
     }
 
-    assert(COND_MAGIC == mutex->flag);          /* assumed to be initialised */
+    assert(MUTEX_MAGIC == mutex->flag);         /* assumed to be initialised */
     assert(1 == mutex->nest);                   /* must be locked once only */
     if (MUTEX_MAGIC != mutex->flag || 1 != mutex->nest) {
         return EINVAL;

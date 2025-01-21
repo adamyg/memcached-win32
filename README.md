@@ -2,5 +2,5 @@
 
 # memcached-win32
 
-memcached 1.6.15 windows service, with TLS and Lua based builtin proxy features enabled; 32 and 64 bit builds.
+memcached 1.6.34 windows service, with TLS and Lua based builtin proxy features enabled; 32 and 64 bit builds.
 

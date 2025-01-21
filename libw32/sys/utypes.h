@@ -1,14 +1,14 @@
 #ifndef LIBW32_SYS_UTYPES_H_INCLUDED
 #define LIBW32_SYS_UTYPES_H_INCLUDED
 #include <edidentifier.h>
-__CIDENT_RCSID(gr_libw32_sys_utypes_h,"$Id: utypes.h,v 1.5 2022/06/13 04:43:20 cvsuser Exp $")
+__CIDENT_RCSID(gr_libw32_sys_utypes_h,"$Id: utypes.h,v 1.6 2025/01/20 19:13:51 cvsuser Exp $")
 __CPRAGMA_ONCE
 
 /* -*- mode: c; indent-width: 4; -*- */
 /* 
  * win32 unix types
  *
- * Copyright (c) 1998 - 2022, Adam Young.
+ * Copyright (c) 1998 - 2025, Adam Young.
  * All rights reserved.
  *
  * This file is part of memcached-win32.
@@ -189,6 +189,20 @@ typedef int id_t;                               /* used as a general identifier;
 #endif
 
 #endif /*_MSC_VER || __MINGW32__*/
+
+#if !defined(_FSBLKCNT_T_DEFINED)
+#define _FSBLKCNT_T_DEFINED
+#if !defined(fsblkcnt_t)
+typedef unsigned long fsblkcnt_t;
+#endif
+#endif
+
+#if !defined(_FSFILCNT_T_DEFINED)
+#define _FSFILCNT_T_DEFINED
+#if !defined(fsfilcnt_t)
+typedef unsigned long fsfilcnt_t;
+#endif
+#endif
 
 #if !defined(HAVE_NLINK_T)
 #if !defined(__WATCOMC__) || \

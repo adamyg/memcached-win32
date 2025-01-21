@@ -1,11 +1,11 @@
 #include <edidentifier.h>
-__CIDENT_RCSID(gr_w32_direntunc_c,"$Id: w32_direntunc.c,v 1.2 2022/06/13 04:06:39 cvsuser Exp $")
+__CIDENT_RCSID(gr_w32_direntunc_c,"$Id: w32_direntunc.c,v 1.3 2025/01/20 19:13:50 cvsuser Exp $")
 
 /* -*- mode: c; indent-width: 4; -*- */
 /*
  * win32 unc directory access services ...
  *
- * Copyright (c) 2007, 2012 - 2022 Adam Young.
+ * Copyright (c) 2007, 2012 - 2025 Adam Young.
  *
  * This file is part of memcached-win32.
  *
@@ -105,7 +105,7 @@ w32_unc_iterateW(const wchar_t *servername, unc_push_t push, void *data)
             // build directory ..
             for (e = 0, ent = buffer; e < entries; ++e, ++ent) {
                 if (STYPE_DISKTREE == ent->shi502_type) {
-                    const WCHAR *filename = ent->shi502_netname;
+                    const wchar_t *filename = ent->shi502_netname;
 
                     if ('p' == filename[0]) {   // prnproc$ or print$
                         if (0 == wcscmp(filename, L"prnproc$") ||
@@ -198,7 +198,7 @@ struct dirent *
 w32_unc_readdirA(DIR *dp)
 {
     DWORD bufsize = 4 * 1024;
-    DWORD result, count;
+    DWORD result, count = 0;
     void *buffer;
     char *cursor;
 
@@ -225,11 +225,11 @@ w32_unc_readdirA(DIR *dp)
 
         if (IS_PATH_SEP(*cursor)) {             // filename component
             struct dirent *dpent = (struct dirent *)dp->dd_buf;
-            int namlen = strlen(cursor);
+            size_t namlen = strlen(cursor);
 
-            if (namlen >= (int)sizeof(dpent->d_name))
+            if (namlen >= sizeof(dpent->d_name))
                 namlen = sizeof(dpent->d_name) - 1;
-            dpent->d_namlen = namlen;
+            dpent->d_namlen = (unsigned short)namlen;
             memcpy(dpent->d_name, cursor, namlen + 1 /*nul*/);
             dpent->d_reclen = sizeof(struct dirent);
             return dpent;
@@ -243,7 +243,7 @@ struct dirent *
 w32_unc_readdirW(DIR *dp)
 {
     DWORD bufsize = 4 * 1024;
-    DWORD result, count;
+    DWORD result, count = 0;
     void *buffer;
     wchar_t *cursor;
 
@@ -320,7 +320,7 @@ w32_unc_validA(const char *path)
                     (scan ? (size_t)(scan - path) : strlen(path));
 
             if (namelen > 0) {
-                return namelen;
+                return (int)namelen;
             }
         }
     }
@@ -341,7 +341,7 @@ w32_unc_validW(const wchar_t *path)
                     (scan ? (size_t)(scan - path) : wcslen(path));
 
             if (namelen > 0) {
-                return namelen;
+                return (int)namelen;
             }
         }
     }

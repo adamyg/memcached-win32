@@ -1,14 +1,14 @@
 #ifndef LIBW32_WIN32_INTERNAL_H_INCLUDED
 #define LIBW32_WIN32_INTERNAL_H_INCLUDED
 #include <edidentifier.h>
-__CIDENT_RCSID(gr_libw32_win32_internal_h,"$Id: win32_internal.h,v 1.5 2022/06/13 04:06:39 cvsuser Exp $")
+__CIDENT_RCSID(gr_libw32_win32_internal_h,"$Id: win32_internal.h,v 1.6 2025/01/20 19:13:51 cvsuser Exp $")
 __CPRAGMA_ONCE
 
 /* -*- mode: c; indent-width: 4; -*- */
 /*
  * internal definitions
  *
- * Copyright (c) 1998 - 2022, Adam Young.
+ * Copyright (c) 1998 - 2025, Adam Young.
  * All rights reserved.
  *
  * This file is part of memcached-win32.
@@ -162,8 +162,8 @@ LIBW32_API SOCKET       w32_sockfd_get (int fd);
 LIBW32_API void         w32_sockfd_close (int fd, SOCKET s);
 LIBW32_API int          w32_issockfd (int fd, SOCKET *s);
 
-LIBW32_API int          w32_reparse_readA (const char *name, char *buf, int maxlen);
-LIBW32_API int          w32_reparse_readW (const wchar_t *name, wchar_t *buf, int maxlen);
+LIBW32_API int          w32_reparse_readA (const char *name, char *buf, size_t maxlen);
+LIBW32_API int          w32_reparse_readW (const wchar_t *name, wchar_t *buf, size_t maxlen);
 
 __END_DECLS
 

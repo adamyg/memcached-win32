@@ -1,5 +1,5 @@
 #include <edidentifier.h>
-__CIDENT_RCSID(gr_w32_dirent_c,"$Id: w32_dirent.c,v 1.3 2022/06/12 16:08:43 cvsuser Exp $")
+__CIDENT_RCSID(gr_w32_dirent_c,"$Id: w32_dirent.c,v 1.4 2025/01/20 19:13:50 cvsuser Exp $")
 
 /* -*- mode: c; indent-width: 4; -*- */
 /*
@@ -7,7 +7,7 @@ __CIDENT_RCSID(gr_w32_dirent_c,"$Id: w32_dirent.c,v 1.3 2022/06/12 16:08:43 cvsu
  *
  *      opendir, closedir, readdir, seekdir, rewindir, telldir
  *
- * Copyright (c) 2007, 2012 - 2022 Adam Young.
+ * Copyright (c) 2007, 2012 - 2025 Adam Young.
  *
  * This file is part of memcached-win32.
  *
@@ -170,8 +170,9 @@ opendirA(const char *dirname)
     char fullpath[ MAX_PATH ], symlink[ MAX_PATH ], reparse[ MAX_PATH ],
         *path = fullpath;
     LPVOID OldValue = NULL;
-    DIR  *dp;
-    int  i, len;
+    DIR *dp;
+    size_t len;
+    int i;
 
     /* Copy to working buffer */
     if (NULL == dirname) {
@@ -312,8 +313,9 @@ opendirW(const wchar_t *dirname)
     wchar_t fullpath[ MAX_PATH ], symlink[ MAX_PATH ], reparse[ MAX_PATH ],
         *path = fullpath;
     LPVOID OldValue = NULL;
-    DIR  *dp;
-    int  i, len;
+    DIR *dp;
+    size_t len;
+    int i;
 
     /* Copy to working buffer */
     if (NULL == dirname) {
