@@ -987,7 +987,11 @@ static int mcp_mut_run(struct mcp_mut_run *run) {
     struct mcp_mutator *mut = run->mut;
     LIBEVENT_THREAD *t = PROXY_GET_THR(run->L);
     int ret = 0;
+#if defined(WIN32PORT)
+    struct mcp_mut_part *parts = _alloca(sizeof(struct mcp_mut_part) * mut->scount);
+#else
     struct mcp_mut_part parts[mut->scount];
+#endif
 
     // first accumulate the length tally
     // FIXME: noticed off-by-one's sometimes.

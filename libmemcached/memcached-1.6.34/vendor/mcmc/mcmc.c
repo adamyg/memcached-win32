@@ -1,3 +1,5 @@
+#include "config.h" //WIN32PORT
+
 #include <stdlib.h>
 #include <sys/socket.h>
 #include <sys/types.h>

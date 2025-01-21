@@ -5064,8 +5064,7 @@ int main (int argc, char **argv) {
         {0, 0, 0, 0}
     };
     int optindex;
-    while (-1 != (c = getopt_long(argc, argv, shortopts,
-                    longopts, &optindex))) {
+    while (-1 != (c = getopt_long(argc, /*WIN32PORT*/ (char **)argv, shortopts, longopts, &optindex))) {
 #else
     while (-1 != (c = getopt(argc, argv, shortopts))) {
 #endif

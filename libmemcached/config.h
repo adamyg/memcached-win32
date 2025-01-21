@@ -31,6 +31,9 @@
 #if !defined(WIN32_UNISTD_MAP)
 #define WIN32_UNISTD_MAP 1                      /* enable unistd function mapping */
 #endif
+#if !defined(__attribute__)
+#define __attribute__(__x) /**/
+#endif
 #endif
 
 #if defined(_MSC_VER)

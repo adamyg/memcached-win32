@@ -188,7 +188,7 @@ void process_proxy_stats(void *arg, ADD_STAT add_stats, void *c) {
     struct proxy_user_stats_entry *us = ctx->user_stats;
     int stats_num = ctx->user_stats_num;
 #if defined(WIN32PORT)
-    uint64_t *counters = alloca(sizeof(uint64_t) * stats_num);
+    uint64_t *counters = _alloca(sizeof(uint64_t) * stats_num);
     memset(counters, 0, sizeof(uint64_t) * stats_num);
 #else
     uint64_t counters[stats_num];

@@ -27,7 +27,11 @@ static int ssl_new_session_callback(SSL *s, SSL_SESSION *sess);
 static pthread_mutex_t ssl_ctx_lock = PTHREAD_MUTEX_INITIALIZER;
 
 const unsigned ERROR_MSG_SIZE = 64;
+#if defined(WIN32PORT) && defined(_MSC_VER)
+#define SSL_ERROR_MSG_SIZE 256
+#else
 const size_t SSL_ERROR_MSG_SIZE = 256;
+#endif
 
 static void SSL_LOCK(void) {
     pthread_mutex_lock(&(ssl_ctx_lock));
