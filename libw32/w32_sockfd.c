@@ -1,5 +1,5 @@
 #include <edidentifier.h>
-__CIDENT_RCSID(gr_w32_sockfd_c,"$Id: w32_sockfd.c,v 1.6 2025/01/20 19:13:51 cvsuser Exp $")
+__CIDENT_RCSID(gr_w32_sockfd_c,"$Id: w32_sockfd.c,v 1.7 2025/01/21 14:59:49 cvsuser Exp $")
 
 /*
  * win32 socket file-descriptor support
@@ -68,7 +68,7 @@ w32_sockfd_init(void)
     if (0 == x_fdhard) {
         unsigned s;
 
-        if (NULL != (x_fdsockets = calloc(sizeof(SOCKET), WIN32_FILDES_MAX))) {
+        if (NULL != (x_fdsockets = calloc(WIN32_FILDES_MAX, sizeof(SOCKET)))) {
             for (s = 0; s < WIN32_FILDES_MAX; ++s) {
                 x_fdsockets[s] = INVALID_SOCKET;
             }
