@@ -398,7 +398,7 @@ void accept_new_conns(const bool do_accept) {
 /****************************** LIBEVENT THREADS *****************************/
 
 static void setup_thread_notify(LIBEVENT_THREAD *me, struct thread_notify *tn,
-        void(*cb)(int, short, void *)) {
+        void(*cb)(/*WIN32PORT, int*/ evutil_socket_t, short, void *)) {
 #ifdef HAVE_EVENTFD
     event_set(&tn->notify_event, tn->notify_event_fd,
               EV_READ | EV_PERSIST, cb, me);

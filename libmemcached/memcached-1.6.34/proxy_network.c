@@ -41,10 +41,10 @@ const char *proxy_be_failure_text[] = {
     NULL
 };
 
-static void proxy_backend_handler(const int fd, const short which, void *arg);
-static void proxy_backend_tls_handler(const int fd, const short which, void *arg);
-static void proxy_beconn_handler(const int fd, const short which, void *arg);
-static void proxy_beconn_tls_handler(const int fd, const short which, void *arg);
+static void proxy_backend_handler(const /*WIN32PORT int*/ evutil_socket_t fd, const short which, void *arg);
+static void proxy_backend_tls_handler(const /*WIN32PORT int*/ evutil_socket_t fd, const short which, void *arg);
+static void proxy_beconn_handler(const /*WIN32PORT int*/ evutil_socket_t fd, const short which, void *arg);
+static void proxy_beconn_tls_handler(const /*WIN32PORT int*/ evutil_socket_t fd, const short which, void *arg);
 static void proxy_event_handler(evutil_socket_t fd, short which, void *arg);
 static void proxy_event_beconn(evutil_socket_t fd, short which, void *arg);
 static int _prep_pending_write(struct mcp_backendconn_s *be);
@@ -764,7 +764,7 @@ static void _backend_reconnect(struct mcp_backendconn_s *be) {
 }
 
 // All we need to do here is schedule the backend to attempt to connect again.
-static void proxy_backend_retry_handler(const int fd, const short which, void *arg) {
+static void proxy_backend_retry_handler(const /*WIN32PORT int*/ evutil_socket_t fd, const short which, void *arg) {
     struct mcp_backendconn_s *be = arg;
     assert(which & EV_TIMEOUT);
     struct timeval tmp_time = be->tunables.connect;
@@ -1064,7 +1064,7 @@ static int _flush_pending_tls_write(struct mcp_backendconn_s *be) {
 }
 
 
-static void proxy_bevalidate_tls_handler(const int fd, const short which, void *arg) {
+static void proxy_bevalidate_tls_handler(const /*WIN32PORT int*/ evutil_socket_t fd, const short which, void *arg) {
     assert(arg != NULL);
     struct mcp_backendconn_s *be = arg;
     int flags = EV_TIMEOUT;
@@ -1154,7 +1154,7 @@ static void proxy_bevalidate_tls_handler(const int fd, const short which, void *
 
 // Libevent handler when we're in TLS mode. Unfortunately the code is
 // different enough to warrant its own function.
-static void proxy_beconn_tls_handler(const int fd, const short which, void *arg) {
+static void proxy_beconn_tls_handler(const /*WIN32PORT int*/ evutil_socket_t fd, const short which, void *arg) {
     assert(arg != NULL);
     struct mcp_backendconn_s *be = arg;
     //int flags = EV_TIMEOUT;
@@ -1206,7 +1206,7 @@ static void proxy_beconn_tls_handler(const int fd, const short which, void *arg)
 }
 
 // Libevent handler for backends in a connecting state.
-static void proxy_beconn_handler(const int fd, const short which, void *arg) {
+static void proxy_beconn_handler(const /*WIN32PORT int*/ evutil_socket_t fd, const short which, void *arg) {
     assert(arg != NULL);
     struct mcp_backendconn_s *be = arg;
     int flags = EV_TIMEOUT;
@@ -1322,7 +1322,7 @@ static void proxy_beconn_handler(const int fd, const short which, void *arg) {
     }
 }
 
-static void proxy_backend_tls_handler(const int fd, const short which, void *arg) {
+static void proxy_backend_tls_handler(const /*WIN32PORT int*/ evutil_socket_t fd, const short which, void *arg) {
     struct mcp_backendconn_s *be = arg;
 
     if (which & EV_TIMEOUT) {
@@ -1382,7 +1382,7 @@ static void proxy_backend_tls_handler(const int fd, const short which, void *arg
 // The libevent backend callback handler.
 // If we end up resetting a backend, it will get put back into a connecting
 // state.
-static void proxy_backend_handler(const int fd, const short which, void *arg) {
+static void proxy_backend_handler(const /*WIN32PORT int*/ evutil_socket_t fd, const short which, void *arg) {
     struct mcp_backendconn_s *be = arg;
 
     if (which & EV_TIMEOUT) {

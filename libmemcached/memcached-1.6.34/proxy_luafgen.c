@@ -42,7 +42,7 @@ int mcplib_funcgen_gc(lua_State *L) {
 }
 
 // handler for *_wait_*() variants and sleep calls
-static void mcp_funcgen_wait_handler(const int fd, const short which, void *arg) {
+static void mcp_funcgen_wait_handler(const /*WIN32PORT int*/ evutil_socket_t fd, const short which, void *arg) {
     mcp_rcontext_t *rctx = arg;
 
     // if we were in waiting: reset wait mode, push wait_done + boolean true

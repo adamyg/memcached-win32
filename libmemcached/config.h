@@ -48,6 +48,11 @@
 #pragma warning(disable:4267) // 'function': conversion from 'size_t' to 'const uint8_t', possible loss of data
 #endif
 
+#if defined(__GNUC__)
+#pragma GCC diagnostic ignored "-Wint-to-pointer-cast"
+#pragma GCC diagnostic ignored "-Wpointer-to-int-cast"
+#endif
+
 /* Define if building universal (internal helper macro) */
 #undef  AC_APPLE_UNIVERSAL_BUILD
 
