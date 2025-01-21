@@ -1,5 +1,5 @@
 #include <edidentifier.h>
-__CIDENT_RCSID(NTService_cpp, "$Id: NTService.cpp,v 1.7 2025/01/20 19:21:08 cvsuser Exp $")
+__CIDENT_RCSID(NTService_cpp, "$Id: NTService.cpp,v 1.8 2025/01/21 16:58:14 cvsuser Exp $")
 
 /* -*- mode: c; indent-width: 8; -*- */
 /*
@@ -37,6 +37,9 @@ __CIDENT_RCSID(NTService_cpp, "$Id: NTService.cpp,v 1.7 2025/01/20 19:21:08 cvsu
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#if defined(_MSC_VER) && (_MSC_VER > 1929)
+#include <stdint.h>
+#endif
 #include <time.h>
 #include <assert.h>
 

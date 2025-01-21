@@ -31,6 +31,9 @@
 
 #include <stdio.h>
 #include <stdarg.h>
+#if defined(_MSC_VER) && (_MSC_VER > 1929)
+#include <stdint.h>
+#endif
 
 #include "NTServiceIIO.h"
 

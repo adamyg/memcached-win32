@@ -28,8 +28,12 @@
  * license for more details.
  * ==end==
  */
- 
+
+#if defined(_MSC_VER) && (_MSC_VER > 1929)
+#include <stdint.h>
+#endif
 #include <stdarg.h>
+
 
 namespace NTService {
 
