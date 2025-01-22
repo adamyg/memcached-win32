@@ -233,14 +233,20 @@
 #if defined(HAVE_STDBOOL_H)
 #include <stdbool.h>
 #else
+#ifndef __cplusplus
 #if !defined(bool)
+#if defined(_MSC_VER)
+#define bool _Bool
+#else
 #define bool char
 #endif
+#endif //bool
 #if !defined(false)
 #define false 0
 #define true 1
-#endif
-#endif
+#endif //false/true
+#endif //__cplusplus
+#endif //HAVE_STDBOOL_H
 
 #if !defined(__attribute__)
 #if defined(_MSC_VER) || defined(__WATCOMC__)

@@ -2,8 +2,9 @@
 include
 tarballs
 references
-objects.*
+obj.*
 lib.*
 bin.*
 Makefile
 *.err
+

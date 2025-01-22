@@ -12,15 +12,12 @@ unless (@ARGV == 2) {
 
 my $host = shift;
 my $threads = shift;
-my %config = {
-        'servers' => [ $host ],
-        'connect_timeout' => 30.0,
-        'select_timeout' => 30.0,
-        'debug' => 1,
-        };
 
-my $memc = new Cache::Memcached(\%config);
-##$memc->set_servers([$host]);
+my $memc = new Cache::Memcached;
+
+$memc->set_connect_timeout(5);
+$memc->set_servers([$host]);
+$memc->set_debug(1);
 $memc->enable_compress(0);
 
 unless ($memc->set("foo", "bar") && $memc->get("foo") eq "bar") {
@@ -105,3 +102,7 @@ sub key {
     if ($n % 2) { $_ .= "a"x20; }
     $_;
 }
+
+1;
+
+
