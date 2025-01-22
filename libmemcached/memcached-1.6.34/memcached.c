@@ -21,6 +21,9 @@
 #include <sys/stat.h>
 #include <sys/socket.h>
 #include <sys/un.h>
+#if !defined(DISABLE_UNIX_SOCKET) && defined(WIN32PORT)
+#include <afunix.h>
+#endif
 #include <signal.h>
 #include <sys/param.h>
 #include <sys/resource.h>
@@ -3531,6 +3534,17 @@ static void maximize_sndbuf(const int sfd) {
  *        when they are successfully added to the list of ports we
  *        listen on.
  */
+#if defined(WIN32PORT)
+static int socket_dup(int fd) {
+    HANDLE hsock;
+    if (DuplicateHandle(GetCurrentProcess(), (HANDLE)((intptr_t)fd), 
+            GetCurrentProcess(), &hsock, 0, FALSE, DUPLICATE_SAME_ACCESS)) {
+        return (int)((intptr_t)hsock);
+    }
+    return -1;
+}
+#endif //WIN32PORT
+
 static int server_socket(const char *xinterface,
                          int port,
                          enum network_transport transport,
@@ -3689,7 +3703,11 @@ static int server_socket(const char *xinterface,
                 if (c == 0) {
                     per_thread_fd = sfd;
                 } else {
+#if defined(WIN32PORT)
+                    per_thread_fd = socket_dup(sfd);
+#else
                     per_thread_fd = dup(sfd);
+#endif
                     if (per_thread_fd < 0) {
                         perror("Failed to duplicate file descriptor");
                         exit(EXIT_FAILURE);
@@ -3915,8 +3933,12 @@ static int new_socket_unix(void) {
         return -1;
     }
 
+#if defined(WIN32PORT)
+    if (socknonblockingio(sfd, 1) < 0) {
+#else
     if ((flags = fcntl(sfd, F_GETFL, 0)) < 0 ||
         fcntl(sfd, F_SETFL, flags | O_NONBLOCK) < 0) {
+#endif
         perror("setting O_NONBLOCK");
         close(sfd);
         return -1;
@@ -3943,10 +3965,14 @@ static int server_socket_unix(const char *path, int access_mask) {
     /*
      * Clean up a previous socket file if we left it around
      */
+#if defined(WIN32PORT)
+    DeleteFileA(path);
+#else
     if (lstat(path, &tstat) == 0) {
         if (S_ISSOCK(tstat.st_mode))
             unlink(path);
     }
+#endif
 
     setsockopt(sfd, SOL_SOCKET, SO_REUSEADDR, (void *)&flags, sizeof(flags));
     setsockopt(sfd, SOL_SOCKET, SO_KEEPALIVE, (void *)&flags, sizeof(flags));

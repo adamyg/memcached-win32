@@ -6,6 +6,7 @@ lib.*/
 bin.*/
 *.ref/
 msvc2015/
+msvc2019/
 tarballs/
 references/
 ref/
@@ -18,3 +19,4 @@ Makefile
 *.obj
 *.o
 *~
+

@@ -63,7 +63,7 @@
 #undef  ASAN
 
 /* Set to nonzero if you want to disable unix domain socket */
-#define DISABLE_UNIX_SOCKET 1
+//#define DISABLE_UNIX_SOCKET 1
 
 /* Set to nonzero if you want to include DTRACE */
 #undef  ENABLE_DTRACE
@@ -205,6 +205,9 @@
 
 /* Set to nonzero if you want to enable TLS */
     //#undef TLS
+#if defined(HAVE_OPENSSL) && !defined(TLS)
+#define TLS
+#endif
 
 /* Version number of package */
 #define VERSION PACKAGE_VERSION

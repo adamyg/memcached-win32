@@ -6,25 +6,35 @@
 
 memcached 1.6.34 windows service, with TLS and Lua based builtin proxy features enabled; 32 and 64 bit builds.
 
-# usage
+## Overview
+
+Free & open source, high-performance, distributed memory object caching system, generic in nature, but intended for use in speeding up dynamic web applications by alleviating database load.
+
+Memcached is an in-memory key-value store for small arbitrary data (strings, objects) from results of database calls, API calls, or page rendering.
+
+Memcached is simple yet powerful. Its simple design promotes quick deployment, ease of development, and solves many problems facing large data caches. Its API is available for most popular languages.
+
+See http://memcached.org/about page for a brief overview and https://docs.memcached.org for additional documentation.
+
+# Usage
 
 Download and extract into a working directory, for example ```c:\memcached```
 
-## install and uninstall
+## Install and uninstall
 
 ```
 memcached_service -d install
 memcached_service -d uninstall
 ```
 
-## start/stop
+## Service start and stop
 
 ```
 memcached_service -d start
 memcached_service -d stop
 ```
 
-## run as non-service
+## Run as non-service
 
 ```
 memcached_service -d run

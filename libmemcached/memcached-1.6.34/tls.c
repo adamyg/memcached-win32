@@ -9,6 +9,13 @@
 #include <openssl/ssl.h>
 #include <openssl/err.h>
 
+#if defined(WIN32PORT)
+#if defined(_MSC_VER)
+#pragma comment(lib, "libcrypto.lib")
+#pragma comment(lib, "libssl.lib")
+#endif
+#endif
+
 /* constant session ID context for application-level SSL session scoping.
  * used in server-side SSL session caching, when enabled. */
 #define SESSION_ID_CONTEXT "memcached"

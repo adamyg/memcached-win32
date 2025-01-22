@@ -299,7 +299,7 @@ Service::Start(const struct Options &options)
 
         if (options_.conf.empty()) {            // system, otherwise default.
                 if (! ConfigGet("conf", options_.conf)) {
-                        char defconf[MAX_PATH] ={0};
+                        char defconf[MAX_PATH] = {0};
 
                         _snprintf(defconf, sizeof(defconf) - 1, "./%s.conf", appname_);
                         options_.conf.assign(defconf);
