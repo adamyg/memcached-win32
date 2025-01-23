@@ -12,28 +12,28 @@ jobs:
             name: "Windows Latest MSVCx64",
             os: windows-latest,
             toolchain: vc2022-x64,
-            toolversion: vs170/x64
+            toolversion: vs170/x64,
             arch: x64
           }
         - {
             name: "Windows Latest MSVCx86",
             os: windows-latest,
             toolchain: vc2022,
-            toolversion: vs170
+            toolversion: vs170,
             arch: x86
           }
         - {
             name: "Windows Latest MinGW64",
             os: windows-latest,
             toolchain: mingw64,
-            toolversion: mingw64
+            toolversion: mingw64,
             arch: x64
           }
         - {
             name: "Windows Latest MinGW32",
             os: windows-latest,
             toolchain: mingw32,
-            toolversion: mingw32
+            toolversion: mingw32,
             arch: x86
           }
     steps:
