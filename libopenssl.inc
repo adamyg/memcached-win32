@@ -5,11 +5,18 @@
 
 HAVE_OPENSSL=	no
 
+# MSVC
 ifeq (vs,$(findstring vs,$(TOOLCHAIN)))
+
+##VSCMD_ARG_HOST_ARCH
+##VSCMD_ARG_TGT_ARCH
+TOOLTARGET?=$(VSCMD_ARG_TGT_ARCH)
+TOOLTARGET?=x86
+
 ifeq ("$(OPENSSL)","")
-OPENSSL=	../vcpkg_installed/x86-windows
+OPENSSL=	../vcpkg_installed/$(TOOLTARGET)-windows
 ifeq ("$(wildcard $(OPENSSL)/*)","")
-OPENSSL=	../../vcpkg/installed/x86-windows
+OPENSSL=	../../vcpkg/installed/$(TOOLTARGET)-windows
 ifeq ("$(wildcard $(OPENSSL)/*)","")
 OPENSSL=
 endif
@@ -31,6 +38,7 @@ OPENSSL_DLLS=	$(notdir $(wildcard $(OPENSSL_BIN)/libssl*.dll)) $(notdir $(wildca
 OPENSSL_LIBS=	/LIBPATH:$(OPENSSL_LIB) libssl.lib libcrypto.lib
 endif
 
+# Mingw32/Mingw64
 else ifeq (mingw,$(findstring mingw,$(TOOLCHAIN)))
 HAVE_OPENSSL=	yes
 OPENSSL_LIBS=	-lssl -lcrypto

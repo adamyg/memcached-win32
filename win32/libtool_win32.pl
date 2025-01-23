@@ -809,7 +809,12 @@ print "*** non-libtool objects @BAD_OBJECTS is not portable!\n";
         #
         if (defined $ENV{'VCToolsInstallDir'}) { # 2010 plus
             my $toolbase = $ENV{'VCToolsInstallDir'};
-            $cmd = "\"${toolbase}\\bin\\Hostx86\\x86\\link\" \@$cmdfile";
+            my $toolarch = "Hostx86\\x86";
+
+            $toolarch = "Hostx64\\x64"          # x86 or x64
+                if (defined $ENV{'VSCMD_ARG_TGT_ARCH'}) && $ENV{'VSCMD_ARG_TGT_ARCH'} eq "x64");
+
+            $cmd = "\"${toolbase}\\bin\\${toolarch}\\link\" \@$cmdfile";
 
         } elsif (defined $ENV{'VCINSTALLDIR'}) { # 2008
             my $toolbase = $ENV{'VCINSTALLDIR'};
