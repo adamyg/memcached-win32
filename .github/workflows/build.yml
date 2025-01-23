@@ -9,22 +9,32 @@ jobs:
       matrix:
         config:
         - {
-            name: "Windows Latest MSVC",
+            name: "Windows Latest MSVCx64",
+            os: windows-latest,
+            toolchain: vc2022-x64,
+            toolversion: vs170/x64
+            arch: x64
+          }
+        - {
+            name: "Windows Latest MSVCx86",
             os: windows-latest,
             toolchain: vc2022,
             toolversion: vs170
+            arch: x86
           }
         - {
-           name: "Windows Latest MinGW64",
-           os: windows-latest,
-           toolchain: mingw64,
-           toolversion: mingw64
+            name: "Windows Latest MinGW64",
+            os: windows-latest,
+            toolchain: mingw64,
+            toolversion: mingw64
+            arch: x64
           }
         - {
-           name: "Windows Latest MinGW32",
-           os: windows-latest,
-           toolchain: mingw32,
-           toolversion: mingw32
+            name: "Windows Latest MinGW32",
+            os: windows-latest,
+            toolchain: mingw32,
+            toolversion: mingw32
+            arch: x86
           }
     steps:
 
@@ -39,20 +49,21 @@ jobs:
       uses: ilammy/msvc-dev-cmd@v1
       if: startsWith(matrix.config.name, 'Windows Latest MSVC')
       with:
-        arch: x86
+        arch: ${{ matrix.config.arch }}
 
     - name: vcpkgs
       if: startsWith(matrix.config.name, 'Windows Latest MSVC')
       shell: cmd
       run: |
         git clone https://github.com/microsoft/vcpkg ../vcpkg
+        if not "%VCPKG_ROOT%" == "" dir /S %VCPKG_ROOT%
+        set VCPKG_ROOT=
         set VCPKG_DISABLE_METRICS=true
-        set VCPKG_DEFAULT_TRIPLET=x86-windows
+        set VCPKG_DEFAULT_TRIPLET=${{ matrix.config.arch }}-windows
         call ..\vcpkg\bootstrap-vcpkg.bat
         ..\vcpkg\vcpkg install
         ..\vcpkg\vcpkg integrate install
         dir /S .\vcpkg_installed
-        if NOT "%VPKG_ROOT%"=="" dir /S %VPKG_ROOT%
 
     - name: MinGW64 setup
       if: startsWith(matrix.config.name, 'Windows Latest MinGW64')
