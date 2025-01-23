@@ -46,10 +46,13 @@ jobs:
       shell: cmd
       run: |
         git clone https://github.com/microsoft/vcpkg ../vcpkg
+        set VCPKG_DISABLE_METRICS=true
+        set VCPKG_DEFAULT_TRIPLET=x86-windows
         call ..\vcpkg\bootstrap-vcpkg.bat
         ..\vcpkg\vcpkg install
         ..\vcpkg\vcpkg integrate install
         dir /S .\vcpkg_installed
+        if NOT "%VPKG_ROOT%"=="" dir /S %VPKG_ROOT%
 
     - name: MinGW64 setup
       if: startsWith(matrix.config.name, 'Windows Latest MinGW64')
