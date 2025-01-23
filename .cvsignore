@@ -2,6 +2,7 @@
 include
 tarballs
 references
+vcpkg_installed
 obj.*
 lib.*
 bin.*
