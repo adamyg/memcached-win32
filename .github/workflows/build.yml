@@ -115,5 +115,7 @@ jobs:
       uses: actions/upload-artifact@v4
       with:
         name: package-${{ matrix.config.toolchain }}
-        path: ./bin.${{ matrix.config.toolversion }}/release/*
+        path: |
+         ./bin.${{ matrix.config.toolversion }}/release/memcached_service.exe*
+         ./bin.${{ matrix.config.toolversion }}/release/*.dll
 
