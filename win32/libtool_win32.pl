@@ -1,6 +1,6 @@
 #!/usr/bin/perl -w
 # -*- mode: perl; -*-
-# $Id: libtool_win32.pl,v 1.2 2022/06/12 16:11:41 cvsuser Exp $
+# $Id: libtool_win32.pl,v 1.3 2025/01/23 01:41:32 cvsuser Exp $
 # libtool emulation for WIN32 builds.
 #
 #   **Warning**
@@ -812,7 +812,7 @@ print "*** non-libtool objects @BAD_OBJECTS is not portable!\n";
             my $toolarch = "Hostx86\\x86";
 
             $toolarch = "Hostx64\\x64"          # x86 or x64
-                if (defined $ENV{'VSCMD_ARG_TGT_ARCH'}) && $ENV{'VSCMD_ARG_TGT_ARCH'} eq "x64");
+                if (defined $ENV{'VSCMD_ARG_TGT_ARCH'} && $ENV{'VSCMD_ARG_TGT_ARCH'} eq "x64");
 
             $cmd = "\"${toolbase}\\bin\\${toolarch}\\link\" \@$cmdfile";
 
