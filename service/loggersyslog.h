@@ -5,7 +5,7 @@
 /*
  * Logger syslog adapter.
  *
- * Copyright (c) 2020 - 2022, Adam Young.
+ * Copyright (c) 2020 - 2025, Adam Young.
  * All rights reserved.
  *
  * This file is part of oncrpc4-win32.

@@ -1,9 +1,9 @@
 #!/usr/bin/perl
-# $Id: makelib.in,v 1.6 2022/06/14 16:48:00 cvsuser Exp $
+# $Id: makelib.in,v 1.7 2025/01/21 05:13:38 cvsuser Exp $
 # -*- mode: perl; tabs: 8; indent-width: 4; -*-
 # makelib configuration
 #
-# Copyright (c) 2020 - 2022, Adam Young.
+# Copyright (c) 2020 - 2025, Adam Young.
 # All rights reserved.
 #
 # The applications are free software: you can redistribute it
@@ -32,7 +32,7 @@
 
 $PACKAGE        = 'memcached-win32';
 $PACKAGE_NAME   = 'Windows Memcached Service';
-$PACKAGE_VERSION = '1.6.15';
+$PACKAGE_VERSION = '1.6.34';
 
 $PACKAGE_URL    = 'https://github.com/adamyg/memcached_win32';
 

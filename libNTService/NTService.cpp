@@ -1,11 +1,11 @@
 #include <edidentifier.h>
-__CIDENT_RCSID(NTService_cpp, "$Id: NTService.cpp,v 1.6 2022/06/12 16:10:06 cvsuser Exp $")
+__CIDENT_RCSID(NTService_cpp, "$Id: NTService.cpp,v 1.8 2025/01/21 16:58:14 cvsuser Exp $")
 
 /* -*- mode: c; indent-width: 8; -*- */
 /*
  * CNTService - Classic window services framework (tweaked).
  *
- * Copyright (c) 2020 - 2022, Adam Young.
+ * Copyright (c) 2020 - 2025, Adam Young.
  * Based on the MSDN example service framework.
  * All rights reserved.
  *
@@ -37,6 +37,9 @@ __CIDENT_RCSID(NTService_cpp, "$Id: NTService.cpp,v 1.6 2022/06/12 16:10:06 cvsu
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#if defined(_MSC_VER) && (_MSC_VER > 1929)
+#include <stdint.h>
+#endif
 #include <time.h>
 #include <assert.h>
 

@@ -1,9 +1,9 @@
 #!/usr/bin/perl -w
 # -*- mode: perl; -*-
-# $Id: version.pl,v 1.1 2022/06/14 13:08:43 cvsuser Exp $
+# $Id: version.pl,v 1.2 2025/01/22 10:25:56 cvsuser Exp $
 # liblua version information
 #
-# Copyright Adam Young 2022
+# Copyright Adam Young 2022 - 2025
 # All rights reserved.
 #
 

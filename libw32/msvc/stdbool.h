@@ -27,7 +27,9 @@ typedef int _Bool;
 #endif
 
 #ifndef __cplusplus
+#if !defined(bool)
 #define bool _Bool
+#endif
 #define true 1
 #define false 0
 #endif

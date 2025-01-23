@@ -1,11 +1,11 @@
 #include <edidentifier.h>
-__CIDENT_RCSID(gr_w32_access_c,"$Id: w32_access.c,v 1.1 2022/06/12 16:08:43 cvsuser Exp $")
+__CIDENT_RCSID(gr_w32_access_c,"$Id: w32_access.c,v 1.2 2025/01/21 08:58:03 cvsuser Exp $")
 
 /* -*- mode: c; indent-width: 4; -*- */
 /*
  * win2 access() system calls
  *
- * Copyright (c) 2022 Adam Young.
+ * Copyright (c) 2022 - 2025, Adam Young.
  * All rights reserved.
  *
  * This file is part of memcached-win32.

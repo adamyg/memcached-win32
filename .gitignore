@@ -1,11 +1,13 @@
 CVS/
 .makelib/
 include/
-objects.*/
+obj.*/
 lib.*/
 bin.*/
 *.ref/
+vcpkg_installed/
 msvc2015/
+msvc2019/
 tarballs/
 references/
 ref/
@@ -18,3 +20,4 @@ Makefile
 *.obj
 *.o
 *~
+

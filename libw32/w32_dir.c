@@ -1,5 +1,5 @@
 #include <edidentifier.h>
-__CIDENT_RCSID(gr_w32_dir_c,"$Id: w32_dir.c,v 1.4 2022/06/12 16:08:43 cvsuser Exp $")
+__CIDENT_RCSID(gr_w32_dir_c,"$Id: w32_dir.c,v 1.6 2025/01/21 14:59:49 cvsuser Exp $")
 
 /* -*- mode: c; indent-width: 4; -*- */
 /*
@@ -7,7 +7,7 @@ __CIDENT_RCSID(gr_w32_dir_c,"$Id: w32_dir.c,v 1.4 2022/06/12 16:08:43 cvsuser Ex
  *
  *      mkdir, rmdir, chdir
  *
- * Copyright (c) 1998 - 2022, Adam Young.
+ * Copyright (c) 1998 - 2025, Adam Young.
  * All rights reserved.
  *
  * This file is part of memcached-win32.
@@ -682,7 +682,7 @@ w32_lnkexpandA(const char *name, char *buf, size_t buflen, unsigned flags)
     char *t_name;
     BOOL ret = 0;
 
-    if (length > 4 && NULL != (t_name = calloc(sizeof(char), length + 1 /*nul*/))) {
+    if (length > 4 && NULL != (t_name = calloc(length + 1 /*nul*/, sizeof(char)))) {
         char *cursor, *end;
         int dots = 0;
 
@@ -736,23 +736,23 @@ LIBW32_API BOOL
 w32_lnkexpandW(const wchar_t *name, wchar_t *buf, size_t buflen, unsigned flags)
 {
     const size_t length = wcslen(name);
-    wchar_t *t_name;
+    wchar_t *t_wname;
     BOOL ret = 0;
 
-    if (length > 4 && NULL != (t_name = calloc(sizeof(wchar_t), length + 1 /*nul*/))) {
+    if (length > 4 && NULL != (t_wname = calloc(length + 1 /*nul*/, sizeof(wchar_t)))) {
         wchar_t *cursor, *end;
         int dots = 0;
 
-        wmemcpy(t_name, name, length + 1 /*nul*/);
+        wmemcpy(t_wname, name, length + 1 /*nul*/);
 
-        for (cursor = t_name + length, end = cursor; --cursor >= t_name;) {
+        for (cursor = t_wname + length, end = cursor; --cursor >= t_wname;) {
             if ('.' == *cursor) {                   // extension
                 if (1 == ++dots) {                  // last/trailing
                     if (0 == w32_io_wstrnicmp(cursor, ".lnk", 4) && (cursor + 4) == end) {
                         //
                         //  <shortcut>.lnk
                         //      - attempt expansion, allowing one within any given path.
-                        const size_t trailing = length - (end - t_name);
+                        const size_t trailing = length - (end - t_wname);
                         const char term = *end;
                         int t_ret;
 
@@ -761,7 +761,7 @@ w32_lnkexpandW(const wchar_t *name, wchar_t *buf, size_t buflen, unsigned flags)
                         if (flags & (term ? SHORTCUT_COMPONENT : SHORTCUT_TRAILING)) {
 
                             *end = 0;               // remove trailing component.
-                            if ((t_ret = w32_readlinkW(t_name, buf, buflen)) > 0) {
+                            if ((t_ret = w32_readlinkW(t_wname, buf, buflen)) > 0) {
                                 if (buflen > (t_ret + trailing)) {
                                     if (trailing) { // appending trailing component(s).
                                         *end = term, wmemcpy(buf + t_ret, end, trailing + 1 /*nul*/);
@@ -779,7 +779,7 @@ w32_lnkexpandW(const wchar_t *name, wchar_t *buf, size_t buflen, unsigned flags)
                 dots = 0;
             }
         }
-        free((void *)t_name);
+        free((void *)t_wname);
     }
     return ret;
 }

@@ -1,3 +1,4 @@
 [submodule "references/mc-crusher"]
 	path = references/mc-crusher
-	url = https://github.com/dormando/mc-crusher.git
+	url = https://github.com/memcached/mc-crusher
+

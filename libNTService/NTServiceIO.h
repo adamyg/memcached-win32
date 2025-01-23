@@ -5,7 +5,7 @@
 /*
  * CNTService - Classic window services framework (tweaked).
  *
- * Copyright (c) 2020 - 2022, Adam Young.
+ * Copyright (c) 2020 - 2025, Adam Young.
  * All rights reserved.
  *
  * This file is part of memcached-win32.
@@ -31,6 +31,9 @@
 
 #include <stdio.h>
 #include <stdarg.h>
+#if defined(_MSC_VER) && (_MSC_VER > 1929)
+#include <stdint.h>
+#endif
 
 #include "NTServiceIIO.h"
 

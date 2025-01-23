@@ -9,27 +9,37 @@ jobs:
       matrix:
         config:
         - {
-            name: "Windows Latest MSVC",
+            name: "Windows Latest MSVCx64",
+            os: windows-latest,
+            toolchain: vc2022-x64,
+            toolversion: vs170/x64,
+            arch: x64
+          }
+        - {
+            name: "Windows Latest MSVCx86",
             os: windows-latest,
             toolchain: vc2022,
-            toolversion: vs170
+            toolversion: vs170,
+            arch: x86
           }
         - {
-           name: "Windows Latest MinGW64",
-           os: windows-latest,
-           toolchain: mingw64,
-           toolversion: mingw64
+            name: "Windows Latest MinGW64",
+            os: windows-latest,
+            toolchain: mingw64,
+            toolversion: mingw64,
+            arch: x64
           }
         - {
-           name: "Windows Latest MinGW32",
-           os: windows-latest,
-           toolchain: mingw32,
-           toolversion: mingw32
+            name: "Windows Latest MinGW32",
+            os: windows-latest,
+            toolchain: mingw32,
+            toolversion: mingw32,
+            arch: x86
           }
     steps:
 
     - name: Checkout repository
-      uses: actions/checkout@v2
+      uses: actions/checkout@v4
 
     - name: Checkout submodules
       run: |
@@ -39,13 +49,17 @@ jobs:
       uses: ilammy/msvc-dev-cmd@v1
       if: startsWith(matrix.config.name, 'Windows Latest MSVC')
       with:
-        arch: x86
+        arch: ${{ matrix.config.arch }}
 
     - name: vcpkgs
       if: startsWith(matrix.config.name, 'Windows Latest MSVC')
       shell: cmd
       run: |
         git clone https://github.com/microsoft/vcpkg ../vcpkg
+        if not "%VCPKG_ROOT%" == "" dir /S %VCPKG_ROOT%
+        set VCPKG_ROOT=
+        set VCPKG_DISABLE_METRICS=true
+        set VCPKG_DEFAULT_TRIPLET=${{ matrix.config.arch }}-windows
         call ..\vcpkg\bootstrap-vcpkg.bat
         ..\vcpkg\vcpkg install
         ..\vcpkg\vcpkg integrate install
@@ -98,8 +112,10 @@ jobs:
         .\win32\gmake-42 release
 
     - name: Package
-      uses: actions/upload-artifact@v2
+      uses: actions/upload-artifact@v4
       with:
         name: package-${{ matrix.config.toolchain }}
-        path: ./bin.${{ matrix.config.toolversion }}/release/*
+        path: |
+         ./bin.${{ matrix.config.toolversion }}/release/memcached_service.exe*
+         ./bin.${{ matrix.config.toolversion }}/release/*.dll
 

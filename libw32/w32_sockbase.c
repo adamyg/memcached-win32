@@ -1,11 +1,11 @@
 #include <edidentifier.h>
-__CIDENT_RCSID(gr_w32_sockbase_c,"$Id: w32_sockbase.c,v 1.4 2022/06/12 16:08:44 cvsuser Exp $")
+__CIDENT_RCSID(gr_w32_sockbase_c,"$Id: w32_sockbase.c,v 1.5 2025/01/20 19:13:51 cvsuser Exp $")
 
 /*
  * win32 socket () system calls
  * Base functionality.
  *
- * Copyright (c) 2007, 2012 - 2022 Adam Young.
+ * Copyright (c) 2007, 2012 - 2025 Adam Young.
  *
  * This file is part of memcached-win32.
  *
@@ -96,6 +96,7 @@ w32_getaddrinfo(const char *nodename, const char *servname,
 {
     int done = 0, ret;
 
+#undef getaddrinfo
 retry:;
     if (0 != (ret = getaddrinfo(nodename, servname, hints, res))) {
         if (0 == done++) {

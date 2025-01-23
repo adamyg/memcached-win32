@@ -1,18 +1,17 @@
 #include <edidentifier.h>
-__CIDENT_RCSID(gr_w32_grp_c,"$Id: w32_grp.c,v 1.5 2022/06/13 04:06:39 cvsuser Exp $")
+__CIDENT_RCSID(gr_w32_grp_c,"$Id: w32_grp.c,v 1.6 2025/01/20 19:13:50 cvsuser Exp $")
 
 /* -*- mode: c; indent-width: 4; -*- */
 /*
  * win32 pwd() implementation
  *
- * Copyright (c) 1998 - 2022, Adam Young.
+ * Copyright (c) 1998 - 2025, Adam Young.
  * All rights reserved.
  *
  * This file is part of memcached-win32.
  *
  * The applications are free software: you can redistribute it
  * and/or modify it under the terms of the GNU General Public License as
- * published by the Free Software Foundation, version 3.
  *
  * Redistributions of source code must retain the above copyright
  * notice, and must be distributed with the license document above.
@@ -537,8 +536,8 @@ fill_groups(void)
             if (x_groups) {
                 struct group *t_groups = (struct group *)realloc(x_groups,
                                             (sizeof(struct group) * ntotal) + cbufsz + bufsz);
-                const int addrdiff = ((char *)t_groups - (char *)x_groups) +
-                                        (sizeof(struct group) * count);
+                const ptrdiff_t addrdiff = ((char *)t_groups - (char *)x_groups) +
+                                            (sizeof(struct group) * count);
 
                 if (NULL == t_groups) {         // realloc failure
                     NetApiBufferFree(groups);
@@ -642,11 +641,11 @@ fill_group(void)
 }
 
 
-static int
+static size_t
 gr_strlen(const char *s, size_t *total)
 {
     if (s && *s) {
-        const int slen = strlen(s);
+        const size_t slen = strlen(s);
         *total += (slen + 1);
         return slen;
     }

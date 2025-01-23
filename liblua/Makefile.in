@@ -1,8 +1,8 @@
 # -*- mode: mak; indent-tabs-mode: t; tab-width: 8 -*-
-# liblua 5.4.4 makefile.
+# liblua 5.4.x makefile.
 #
 #
-# Copyright (c) 2022, Adam Young.
+# Copyright (c) 2022 - 2025, Adam Young.
 # All rights reserved.
 #
 # The applications are free software: you can redistribute it
@@ -64,15 +64,25 @@ ifneq ("$(BUILD_TYPE)","release")
 RTSUFFIX=d
 endif
 
+QUIETOUT:=	>/dev/null 2>&1
+ifeq ($(VERBOSE),1)
+QUIETOUT:=
+else ifeq ($(VERBOSE),0)
+else ifeq ($(VERBOSE),)
+else
+$(error VERBOSE: unexpected value 0 or 1 required, $(VERBOSE) given]))
+endif
+
 # Directories
 
 D_INC=		$(ROOT)/include
 D_BIN=		$(ROOT)/bin@TOOLCHAINEXT@/$(BUILD_TYPE)
-D_OBJ=		$(ROOT)/objects@TOOLCHAINEXT@/$(BUILD_TYPE)/liblua
+D_OBJ=		$(ROOT)/obj@TOOLCHAINEXT@/$(BUILD_TYPE)/liblua
 D_LIB=		$(ROOT)/lib@TOOLCHAINEXT@/$(BUILD_TYPE)
 
-VERSION=	5.4.4
-LIBROOT=	lua54
+#VERSION=	5.4.4
+VERSION=	5.4.7
+LIBROOT=	lua
 VERSIONSPEC=	$(subst .,:,$(VERSION))
 PACKED=		lua-$(VERSION).tar.gz
 SRCDIR=		./lua-$(VERSION)/src
@@ -174,7 +184,7 @@ INSTALLED=
 #########################################################################################
 # Rules
 
-.PHONY:			build release debug
+.PHONY:		build debug release
 build:			source unpacked
 unpacked:		directories version.h $(LIBRARIES) $(BINARIES) installinc
 
@@ -190,7 +200,8 @@ $(LUALIB):		$(LIBOBJS)
 
 INSTALLED+=	$(D_BIN)/lib$(LIBROOT).dll
 $(LUADLL):		CEXTRA += -DLUA_BUILD_AS_DLL
-##$(LUADLL):		DLLDEF = -export-symbols liblua.def -version-number $(VERSIONSPEC)
+##$(LUADLL):		DLLDEF = -export-symbols liblua.def
+$(LUADLL):		DLLDEF = -version-number $(VERSIONSPEC)
 $(LUADLL):		$(DLLOBJS)
 		$(LIBTOOL) --mode=link $(CC) $(LDFLAGS) -o $@ \
 			-rpath $(D_LIB) -bindir $(D_BIN) $(DLLDEF) $^ $(LDLIBS)
@@ -234,9 +245,9 @@ version.h:		Makefile version.pl
 
 clean:
 		@echo $(BUILD_TYPE) clean
-		-@$(LIBTOOL) --mode=clean $(RM) $(LUADLL) $(DLLOBJS) >/dev/null 2>&1
-		-@$(RM) $(RMFLAGS) $(BAK) $(INSTALLED) $(LUALIB) $(LIBOBJS) $(CLEAN) $(XCLEAN) >/dev/null 2>&1
-		-@$(RM) $(RMFLAGS) ../include/a_out.h >/dev/null 2>&1
+		-@$(LIBTOOL) --mode=clean $(RM) $(LUADLL) $(DLLOBJS) $(QUIETOUT)
+		-@$(RM) $(RMFLAGS) $(BAK) $(INSTALLED) $(LUALIB) $(LIBOBJS) $(CLEAN) $(XCLEAN) $(QUIETOUT)
+		-@$(RM) $(RMFLAGS) ../include/a_out.h $(QUIETOUT)
 
 $(D_OBJ)/%$(O):		%$(C)
 		$(CC) $(CFLAGS) -o $@ -c $<

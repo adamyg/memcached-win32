@@ -31,6 +31,11 @@
 #if !defined(WIN32_UNISTD_MAP)
 #define WIN32_UNISTD_MAP 1                      /* enable unistd function mapping */
 #endif
+
+#if !defined(__attribute__) && \
+        (defined(_MSC_VER) || defined(__WATCOMC__))
+#define __attribute__(__x) /**/
+#endif
 #endif
 
 #if defined(_MSC_VER)
@@ -43,6 +48,11 @@
 #pragma warning(disable:4267) // 'function': conversion from 'size_t' to 'const uint8_t', possible loss of data
 #endif
 
+#if defined(__GNUC__)
+#pragma GCC diagnostic ignored "-Wint-to-pointer-cast"
+#pragma GCC diagnostic ignored "-Wpointer-to-int-cast"
+#endif
+
 /* Define if building universal (internal helper macro) */
 #undef  AC_APPLE_UNIVERSAL_BUILD
 
@@ -53,7 +63,7 @@
 #undef  ASAN
 
 /* Set to nonzero if you want to disable unix domain socket */
-#define DISABLE_UNIX_SOCKET 1
+//#define DISABLE_UNIX_SOCKET 1
 
 /* Set to nonzero if you want to include DTRACE */
 #undef  ENABLE_DTRACE
@@ -195,6 +205,9 @@
 
 /* Set to nonzero if you want to enable TLS */
     //#undef TLS
+#if defined(HAVE_OPENSSL) && !defined(TLS)
+#define TLS
+#endif
 
 /* Version number of package */
 #define VERSION PACKAGE_VERSION
@@ -223,14 +236,20 @@
 #if defined(HAVE_STDBOOL_H)
 #include <stdbool.h>
 #else
+#ifndef __cplusplus
 #if !defined(bool)
+#if defined(_MSC_VER)
+#define bool _Bool
+#else
 #define bool char
 #endif
+#endif //bool
 #if !defined(false)
 #define false 0
 #define true 1
-#endif
-#endif
+#endif //false/true
+#endif //__cplusplus
+#endif //HAVE_STDBOOL_H
 
 #if !defined(__attribute__)
 #if defined(_MSC_VER) || defined(__WATCOMC__)

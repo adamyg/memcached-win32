@@ -2,8 +2,10 @@
 include
 tarballs
 references
-objects.*
+vcpkg_installed
+obj.*
 lib.*
 bin.*
 Makefile
 *.err
+

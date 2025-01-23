@@ -1,17 +1,16 @@
 #include <edidentifier.h>
-__CIDENT_RCSID(gr_w32_reparse_c,"$Id: w32_reparse.c,v 1.5 2022/06/12 16:08:44 cvsuser Exp $")
+__CIDENT_RCSID(gr_w32_reparse_c,"$Id: w32_reparse.c,v 1.6 2025/01/20 19:13:51 cvsuser Exp $")
 
 /* -*- mode: c; indent-width: 4; -*- */
 /*
  * reparse point utilises
  *
- * Copyright (c) 2007, 2012 - 2022 Adam Young.
+ * Copyright (c) 2007, 2012 - 2025 Adam Young.
  *
  * This file is part of memcached-win32.
  *
  * The applications are free software: you can redistribute it
  * and/or modify it under the terms of the GNU General Public License as
- * published by the Free Software Foundation, version 3.
  *
  * Redistributions of source code must retain the above copyright
  * notice, and must be distributed with the license document above.
@@ -54,7 +53,7 @@ __CIDENT_RCSID(gr_w32_reparse_c,"$Id: w32_reparse.c,v 1.5 2022/06/12 16:08:44 cv
 
 
 static void
-replace_dir(char *buf, int maxlen, const char *original, const char *replacement)
+replace_dir(char *buf, size_t maxlen, const char *original, const char *replacement)
 {
     assert(buf && maxlen > 0);
 
@@ -64,8 +63,8 @@ replace_dir(char *buf, int maxlen, const char *original, const char *replacement
 
                                                 /* note: wont deal with parent directory references */
         if (d++) {                              /* include delimitor within result */
-            const int dirlen =
-                ((d - original) < maxlen ? (d - original) : maxlen);
+            const size_t dirlen =
+                ((size_t)(d - original) < maxlen ? (size_t)(d - original) : maxlen);
 
             memcpy(buf, original, dirlen);
             strncpy(buf + dirlen, replacement, maxlen - dirlen);
@@ -79,7 +78,7 @@ replace_dir(char *buf, int maxlen, const char *original, const char *replacement
 
 
 static void
-replace_wdir(wchar_t *buf, int maxlen, const wchar_t *original, const wchar_t *replacement)
+replace_wdir(wchar_t *buf, size_t maxlen, const wchar_t *original, const wchar_t *replacement)
 {
     assert(buf && maxlen > 0);
 
@@ -89,8 +88,8 @@ replace_wdir(wchar_t *buf, int maxlen, const wchar_t *original, const wchar_t *r
 
                                                 /* note: wont deal with parent directory references */
         if (d++) {                              /* include delimitor within result */
-            const int dirlen =
-                ((d - original) < maxlen ? (d - original) : maxlen);
+            const size_t dirlen =
+                ((size_t)(d - original) < maxlen ? (size_t)(d - original) : maxlen);
 
             wmemcpy(buf, original, dirlen);
             wcsncpy(buf + dirlen, replacement, maxlen - dirlen);
@@ -104,7 +103,7 @@ replace_wdir(wchar_t *buf, int maxlen, const wchar_t *original, const wchar_t *r
 
 
 static void
-memxcpy(char *dst, const char *src, int len, int maxlen)
+memxcpy(char *dst, const char *src, size_t len, size_t maxlen)
 {
     if (len >= maxlen) len = maxlen - 1;        /* limit to upper limit; plus nul terminator */
     (void) memcpy(dst, src, len);
@@ -113,7 +112,7 @@ memxcpy(char *dst, const char *src, int len, int maxlen)
 
 
 LIBW32_API int
-w32_reparse_readA(const char *name, char *buf, int maxlen)
+w32_reparse_readA(const char *name, char *buf, size_t maxlen)
 {
     BYTE reparseBuffer[MAX_REPARSE_SIZE];       /* XXX: warning: owc crash if = {0} under full optimisation */
     PREPARSE_DATA_BUFFER rdb = (PREPARSE_DATA_BUFFER)reparseBuffer;
@@ -217,7 +216,7 @@ w32_reparse_readA(const char *name, char *buf, int maxlen)
 
 
 LIBW32_API int
-w32_reparse_readW(const wchar_t *name, wchar_t *buf, int maxlen)
+w32_reparse_readW(const wchar_t *name, wchar_t *buf, size_t maxlen)
 {
     BYTE reparseBuffer[MAX_REPARSE_SIZE];       /* XXX: warning: owc crash if = {0} under full optimisation */
     PREPARSE_DATA_BUFFER rdb = (PREPARSE_DATA_BUFFER)reparseBuffer;

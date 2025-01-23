@@ -14,14 +14,17 @@ my $host = shift;
 my $threads = shift;
 
 my $memc = new Cache::Memcached;
-$memc->set_servers([$host]);
 
-unless ($memc->set("foo", "bar") &&
-        $memc->get("foo") eq "bar") {
+$memc->set_connect_timeout(5);
+$memc->set_servers([$host]);
+$memc->set_debug(1);
+$memc->enable_compress(0);
+
+unless ($memc->set("foo", "bar") && $memc->get("foo") eq "bar") {
     die "memcached not running at $host ?\n";
 }
-$memc->disconnect_all();
 
+$memc->disconnect_all();
 
 my $running = 0;
 while (1) {
@@ -99,3 +102,7 @@ sub key {
     if ($n % 2) { $_ .= "a"x20; }
     $_;
 }
+
+1;
+
+

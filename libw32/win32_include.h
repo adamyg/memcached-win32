@@ -1,14 +1,14 @@
 #ifndef LIBW32_WIN32_INCLUDE_H_INCLUDED
 #define LIBW32_WIN32_INCLUDE_H_INCLUDED
 #include <edidentifier.h>
-__CIDENT_RCSID(gr_libw32_include_h,"$Id: win32_include.h,v 1.4 2022/06/12 16:08:45 cvsuser Exp $")
+__CIDENT_RCSID(gr_libw32_include_h,"$Id: win32_include.h,v 1.5 2025/01/20 19:13:51 cvsuser Exp $")
 __CPRAGMA_ONCE
 
 /* -*- mode: c; indent-width: 4; -*- */
 /*
  * winsock2.h and windows.h include guard
  *
- * Copyright (c) 1998 - 2022, Adam Young.
+ * Copyright (c) 1998 - 2025, Adam Young.
  * All rights reserved.
  *
  * This file is part of memcached-win32.
@@ -36,11 +36,12 @@ __CPRAGMA_ONCE
  *  WinSock/Windows definitions
  */
 
+/* compiler tweaks */
+
 #if defined(_MSC_VER)
 #if !defined(_CRT_SECURE_NO_DEPRECATE)
 #define _CRT_SECURE_NO_DEPRECATE                /* disable deprecate warnings */
 #endif
-
     //#if !defined(_CRT_NO_POSIX_ERROR_CODES)
     //#define _CRT_NO_POSIX_ERROR_CODES             /* disable POSIX error number, see <errno.h> */
     //#endif
@@ -51,6 +52,10 @@ __CPRAGMA_ONCE
     //#define NTDDI_VERSION 0x06000000              /* iphlpapi.h requirement, inet_ntop .. */
     //#endif
     //#endif
+
+#if defined(__GNUC__)   /*BOOST_GCC_VERSION equiv*/
+#define GCC_VERSION (__GNUC__ * 10000 + __GNUC_MINOR__ * 100 + __GNUC_PATCHLEVEL__)
+#endif
 
 /* winsock and friends */
 

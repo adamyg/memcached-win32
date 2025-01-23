@@ -1,9 +1,9 @@
 # -*- mode: mak; indent-tabs-mode: t; tab-width: 8 -*-
-# $Id: Makefile.in,v 1.5 2022/06/12 16:08:42 cvsuser Exp $
+# $Id: Makefile.in,v 1.8 2025/01/22 15:39:46 cvsuser Exp $
 # libw32 makefile.
 #
 #
-# Copyright (c) 2007, 2012 - 2022 Adam Young.
+# Copyright (c) 2007, 2012 - 2025 Adam Young.
 # All rights reserved.
 #
 # The applications are free software: you can redistribute it
@@ -26,7 +26,7 @@
 #
 
 @SET_MAKE@
-ROOT=		@abs_top_builddir@
+ROOT?=		@abs_top_builddir@
 top_builddir=	@top_builddir@
 
 # File extensions
@@ -60,12 +60,21 @@ ifneq ("$(BUILD_TYPE)","release")
 RTSUFFIX=d
 endif
 
+QUIETOUT:=	>/dev/null 2>&1
+ifeq ($(VERBOSE),1)
+QUIETOUT:=
+else ifeq ($(VERBOSE),0)
+else ifeq ($(VERBOSE),)
+else
+$(error VERBOSE: unexpected value 0 or 1 required, $(VERBOSE) given]))
+endif
+
 # Directories
 
 D_INC=		$(ROOT)/include
 D_BIN=		$(ROOT)/bin@TOOLCHAINEXT@/$(BUILD_TYPE)
+D_OBJ=		$(ROOT)/obj@TOOLCHAINEXT@/$(BUILD_TYPE)/libw32
 D_LIB=		$(ROOT)/lib@TOOLCHAINEXT@/$(BUILD_TYPE)
-D_OBJ=		$(ROOT)/objects@TOOLCHAINEXT@/$(BUILD_TYPE)/libw32
 
 # Common flags
 
@@ -135,6 +144,7 @@ CSOURCES=\
 	w32_gethostname.c \
 	w32_getopt.c \
 	w32_getopt_long.c \
+	w32_getopt_vars.c \
 	w32_getrlimit.c \
 	w32_getrusage.c \
 	w32_getsubopt.c \
@@ -206,6 +216,9 @@ release:
 debug:
 		$(MAKE) BUILD_TYPE=debug $(filter-out debug, $(MAKECMDGOALS))
 
+CEXTRA := $(CEXTRA:-DLIBW32_STATIC%=)
+CEXTRA := $(CEXTRA:-DLIBW32_DYNAMIC%=)
+
 $(W32LIB):		CEXTRA += -DLIBW32_STATIC -DLIBW32_LIBRARY
 $(W32LIB):		$(D_OBJ)/.created $(LIBOBJS)
 		$(RM) $(RMFLAGS) $@
@@ -214,7 +227,11 @@ $(W32LIB):		$(D_OBJ)/.created $(LIBOBJS)
 
 INSTALLED+=	$(D_BIN)/libw32.$(VERSION).dll
 $(W32DLL):		CEXTRA += -DLIBW32_DYNAMIC -DLIBW32_LIBRARY
+ifeq (mingw,$(findstring mingw,"@TOOLCHAIN@"))
+$(W32DLL):		DLLDEF = -export-symbols libw32_mingw.def
+else
 $(W32DLL):		DLLDEF = -export-symbols libw32.def
+endif
 $(W32DLL):		$(DLLOBJS)
 		$(LIBTOOL) --mode=link $(CC) $(LDFLAGS) -o $@ -version-number $(VERSIONSPEC) \
 			-rpath $(D_LIB) -bindir $(D_BIN) $(DLLDEF) $^ $(LDLIBS)
@@ -225,9 +242,9 @@ $(D_OBJ)/.created:
 
 clean:
 		@echo $(BUILD_TYPE) clean
-		-@$(LIBTOOL) --mode=clean $(RM) $(W32DLL) $(DLLOBJS) >/dev/null 2>&1
-		-@$(RM) $(RMFLAGS) $(BAK) $(TSKS) $(INSTALLED) $(W32LIB) $(CLEAN) $(XCLEAN) >/dev/null 2>&1
-		-@$(RM) $(RMFLAGS) $(LIBOBJS) >/dev/null 2>&1
+		-@$(LIBTOOL) --mode=clean $(RM) $(W32DLL) $(DLLOBJS) $(QUIETOUT)
+		-@$(RM) $(RMFLAGS) $(BAK) $(TSKS) $(INSTALLED) $(W32LIB) $(CLEAN) $(XCLEAN) $(QUIETOUT)
+		-@$(RM) $(RMFLAGS) $(LIBOBJS) $(QUIETOUT)
 
 $(D_OBJ)/%$(O):		%.c
 		$(CC) $(CFLAGS) -o $@ -c $<
